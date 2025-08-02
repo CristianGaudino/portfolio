@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+@theme inline{
+    /* Custom Fonts */
+    --font-primary: var(--font-share-tech);
+}
+
+@theme {
+    /* Custom Colours */
+    --color-beige-100: #f8f6f3;
+    --color-beige-200: #eee9e4;
+    --color-beige-300: #d7cec7;
+    --color-beige-400: #b8afa7;
+    --color-beige-500: #9c928b;
+    --color-beige-600: #3e3e3e;
+    --color-beige-700: #2a2a2a;
+    --color-beige-800: #1e1e1e; 
+
+    /* Custom Breakpoints */
+    --breakpoint-xs: 480px;
+}
+
+/* @layer utilities {
+    .font-primary {
+      font-family: var(--font-primary);
+    }
+} */
+
+@layer base {
+    button:not(:disabled),
+    [role="button"]:not(:disabled) {
+        cursor: pointer;
+    }
+
+    /* input, textarea, select {
+        @apply border border-gray-300 focus:outline focus:outline-sky-500;
+    } */
+}
