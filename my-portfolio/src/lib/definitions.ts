@@ -44,6 +44,20 @@ export const SKILLS = [
     "PostgreSQL",
     "Jest",
     "Python",
+    "PL/SQL",
+    "PHP",
+    "MySQL",
+    "JavaScript",
+    "HTML",
+    "CSS",
+    "Bootstrap 5",
+    "Laminas PHP",
+    "JQuery",
+    "Oracle",
+    "Vercel",
+    "Git",
+    "Agile Development",
+    "AI Development",
 ];
 
 export const TASKS_BY_STATUS: Record<string, string[]> = {
