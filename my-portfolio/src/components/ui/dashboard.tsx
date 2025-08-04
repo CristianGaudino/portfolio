@@ -52,7 +52,7 @@ export function Dashboard() {
     const totalYears = academicYears + professionalYears;
 
     return (
-        <div className="p-6 bg-beige-800 text-beige-300 flex flex-col items-center space-y-3 h-full w-full overflow-y-auto rounded-md border border-beige-600 shadow-inner">
+        <div className="p-4 bg-beige-800 text-beige-300 flex flex-col items-center space-y-3 h-full w-full overflow-y-auto rounded-md border border-beige-600 max-w-108">
             <div className="text-lg font-semibold text-accent-light">System Dashboard</div>
 
             {/* Avatar */}
@@ -102,10 +102,17 @@ export function Dashboard() {
                 <span className="text-accent-light mr-1">Active Process:</span>
                 {activeTask.task ? (
                     <>
-                        {activeTask.task} <span className="text-accent-med">[PID:{activeTask.pid}]</span>
+                        {activeTask.task}
+                        <br/>
+                        <span className="text-accent-med">[PID:{activeTask.pid}]</span>
                     </>
                 ) : (
-                    <span className="text-accent-med">Loading task...</span>
+                    <>
+                        <span className="text-accent-med">Loading task...</span>
+                        <br/>
+                        <span className="text-accent-med">[PID: ...]</span>
+                    </>
+                    
                 )}
             </div>
 

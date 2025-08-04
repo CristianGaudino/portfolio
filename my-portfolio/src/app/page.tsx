@@ -2,17 +2,11 @@
 
 import { useRef, useState } from 'react';
 import { TerminalModal } from '@/components/ui/terminal-modal';
-import { Share_Tech_Mono } from 'next/font/google';
 import { Dashboard } from '@/components/ui/dashboard';
 import { FaGithub, FaLinkedin } from 'react-icons/fa6';
 import TerminalOutput from '@/components/ui/terminal-output';
 import { TerminalOutputHandle } from '@/lib/definitions';
- 
-const shareTechMono = Share_Tech_Mono({
-    subsets: ['latin'],
-    variable: '--font-share-tech',
-    weight: ['400']
-});
+import { shareTechMono } from '@/components/ui/fonts';
 
 const COMMANDS = [
     { id: 'about', label: 'about' },
@@ -39,10 +33,11 @@ export default function Home() {
 
     return (
         <>
-            <div className={`min-h-screen bg-beige-800 text-beige-300 ${shareTechMono.variable} font-primary`}>
-                <main className="mx-auto px-4 py-12">
-                    <div className="flex gap-8">
-                        <div className="space-y-4 min-w-[180px] w-1/2">
+            <div className={`min-h-screen flex flex-col bg-beige-800 text-beige-300 ${shareTechMono.variable} font-primary`}>
+                <main className="flex-grow flex px-4 py-6 gap-4">
+                    <div className="w-1/2">
+                        <h1 className='mb-2'>cristiano_gaudino/</h1>
+                        <div className='space-y-2 ml-2'>
                             {COMMANDS.map(cmd => (
                                 <button
                                     key={cmd.id}
@@ -54,11 +49,10 @@ export default function Home() {
                                 </button>
                             ))}
                         </div>
-                        <div className="w-1/2">
-                            <Dashboard/>
-                        </div>
                     </div>
-                    
+                    <div className="w-1/2 flex justify-end self-start me-2">
+                        <Dashboard/>
+                    </div>
                 </main>
 
                 {activeCommand && (
@@ -67,8 +61,8 @@ export default function Home() {
                 
                 <TerminalOutput ref={termRef} />
 
-                <footer className="w-full mt-12 py-6 bg-beige-900 text-beige-400 flex flex-col md:flex-row items-center justify-between px-8 border-t border-beige-700 font-primary">
-                    <span className=" tracking-wide mb-4 md:mb-0">cgaudino.os</span>
+                <footer className="w-full py-3 bg-beige-900 text-beige-400 flex flex-row items-center justify-between px-8 border-t border-beige-700 font-primary">
+                    <span className="mb-0">cgaudino.os</span>
                     <div className="flex items-center gap-4">
                         <a href="https://github.com/CristianGaudino" className="underline flex items-center" target="_blank" rel="noopener noreferrer">
                             <FaGithub className="text-white mr-2" />
