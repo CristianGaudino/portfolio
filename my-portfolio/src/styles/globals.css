@@ -14,7 +14,11 @@
     --color-beige-500: #9c928b;
     --color-beige-600: #3e3e3e;
     --color-beige-700: #2a2a2a;
-    --color-beige-800: #1e1e1e; 
+    --color-beige-800: #1e1e1e;
+
+    --color-accent-light: #A78BFA;
+    --color-accent-med: #4F518C;
+    --color-accent-dark: #2C2A4A;
 
     /* Custom Breakpoints */
     --breakpoint-xs: 480px;
