@@ -8,7 +8,7 @@ import { TerminalModalProps } from '@/lib/definitions';
 
 const contentMap: Record<string, React.ReactElement> = {
     about: (
-        <div>I'm a software developer with 8 years of experience (4 professional, 4 academic).</div>
+        <div>I&apos;m a software developer with 8 years of experience (4 professional, 4 academic).</div>
     ),
     experience: (
         <div>

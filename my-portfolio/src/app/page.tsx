@@ -1,6 +1,5 @@
 'use client';
 
-import Head from 'next/head';
 import { useRef, useState } from 'react';
 import { TerminalModal } from '@/components/ui/terminal-modal';
 import { Share_Tech_Mono } from 'next/font/google';
@@ -16,10 +15,10 @@ const shareTechMono = Share_Tech_Mono({
 });
 
 const COMMANDS = [
-    { id: 'about', label: '>> about' },
-    { id: 'experience', label: '>> experience' },
-    { id: 'projects', label: '>> projects' },
-    { id: 'social', label: '>> socials' },
+    { id: 'about', label: 'about' },
+    { id: 'experience', label: 'experience' },
+    { id: 'projects', label: 'projects' },
+    { id: 'skills', label: 'skills' },
 ];
 
 export default function Home() {
@@ -51,7 +50,7 @@ export default function Home() {
                                     onClick={() => handleClick()}
                                     className="block w-full text-left hover:text-beige-100 transition-colors"
                                 >
-                                    {cmd.label}
+                                    &gt;&gt; {cmd.label}
                                 </button>
                             ))}
                         </div>

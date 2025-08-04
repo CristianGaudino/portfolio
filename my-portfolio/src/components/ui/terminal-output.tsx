@@ -57,4 +57,6 @@ const TerminalOutput = forwardRef<TerminalOutputHandle>((_, ref) => {
     );
 });
 
+TerminalOutput.displayName = "TerminalOutput";
+
 export default TerminalOutput;

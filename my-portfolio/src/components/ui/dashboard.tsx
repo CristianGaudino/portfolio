@@ -7,14 +7,21 @@ import { FaArrowsRotate, FaGraduationCap, FaUserTie } from "react-icons/fa6";
 
 export function Dashboard() {
     const [uptime, setUptime] = useState(getUptimeInSeconds());
-    const [highlightedSkill, setHighlightedSkill] = useState<string>(() => {
-        return SKILLS[Math.floor(Math.random() * SKILLS.length)];
-    });
-    const [{ status, color }, setStatus] = useState(getDevStatus());
-    const [activeTask, setActiveTask] = useState(() =>
-        getTaskByStatus(getDevStatus().status)
-    );
+    const [highlightedSkill, setHighlightedSkill] = useState<string>("");
+    const [{ status, color }, setStatus] = useState({ status: "", color: "" });
+    const [activeTask, setActiveTask] = useState({ task: "", pid: 0 });
     const { version } = getVersion();
+
+    useEffect(() => {
+        const skill = SKILLS[Math.floor(Math.random() * SKILLS.length)];
+        setHighlightedSkill(skill);
+    }, []);
+
+    useEffect(() => {
+        const current = getDevStatus();
+        setStatus(current);
+        setActiveTask(getTaskByStatus(current.status));
+    }, []);
 
     useEffect(() => {
         const timer = setInterval(() => setUptime((u) => u + 1), 1000);
@@ -87,13 +94,19 @@ export function Dashboard() {
 
             {/* Last Commit */}
             <div className="text-sm w-full text-center">
-                <span className="text-accent-light">Last Commit:</span> 2025-08-01
+                <span className="text-accent-light mr-1">Last Commit:</span>2025-08-01
             </div>
 
             {/* Active Process */}
             <div className="text-sm w-full text-center">
-                <span className="text-accent-light">Active Process:</span>{" "}
-                {activeTask.task} <span className="text-accent-med">[PID:{activeTask.pid}]</span>
+                <span className="text-accent-light mr-1">Active Process:</span>
+                {activeTask.task ? (
+                    <>
+                        {activeTask.task} <span className="text-accent-med">[PID:{activeTask.pid}]</span>
+                    </>
+                ) : (
+                    <span className="text-accent-med">Loading task...</span>
+                )}
             </div>
 
             {/* Highlighted Skill */}
@@ -105,7 +118,11 @@ export function Dashboard() {
                     </button>
                 </div>
                 <div className="w-full h-8 bg-accent-dark rounded flex items-center px-2 text-sm text-accent-light">
-                    {highlightedSkill}
+                    {highlightedSkill ? (
+                        <div>{highlightedSkill}</div>
+                    ) : (
+                        <div className="animate-pulse text-accent-med">Loading skill...</div>
+                    )}
                 </div>
             </div>
         </div>
