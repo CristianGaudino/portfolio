@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaGithub, FaLinkedin } from 'react-icons/fa';
 import { HiOutlineXMark } from 'react-icons/hi2';
 import { toTitleCase } from '@/lib/utils';
+import { TerminalModalProps } from '@/lib/definitions';
 
 const contentMap: Record<string, React.ReactElement> = {
     about: (
