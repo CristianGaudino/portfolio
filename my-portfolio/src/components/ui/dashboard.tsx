@@ -16,8 +16,6 @@ export function Dashboard() {
     );
     const { version } = getVersion();
 
-    // const [activeTask] = useState(getRandomTask());
-
     useEffect(() => {
         const timer = setInterval(() => setUptime((u) => u + 1), 1000);
         return () => clearInterval(timer);
@@ -47,7 +45,7 @@ export function Dashboard() {
     const totalYears = academicYears + professionalYears;
 
     return (
-        <div className="p-6 bg-beige-800 text-beige-300 flex flex-col items-center space-y-4 h-full w-full overflow-y-auto rounded-md border border-beige-600 shadow-inner">
+        <div className="p-6 bg-beige-800 text-beige-300 flex flex-col items-center space-y-3 h-full w-full overflow-y-auto rounded-md border border-beige-600 shadow-inner">
             <div className="text-lg font-semibold text-accent-light">System Dashboard</div>
 
             {/* Avatar */}
@@ -58,10 +56,10 @@ export function Dashboard() {
             {/* Version & Uptime */}
             <div className="text-sm space-y-1 text-center">
                 <div>{version}</div>
-                <div className="flex justify-center items-center gap-1">
+                {/* <div className="flex justify-center items-center gap-1">
                     <span className="text-accent-light">Uptime:</span>
                     <span>{uptime.toLocaleString()}s</span>
-                </div>
+                </div> */}
             </div>
 
             {/* Status */}
