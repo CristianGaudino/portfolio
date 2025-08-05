@@ -1,23 +1,38 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { TerminalModal } from '@/components/ui/terminal-modal';
 import { Dashboard } from '@/components/ui/dashboard';
 import { FaGithub, FaLinkedin } from 'react-icons/fa6';
 import TerminalOutput from '@/components/ui/terminal-output';
-import { TerminalOutputHandle } from '@/lib/definitions';
+import { COMMANDS, TerminalOutputHandle } from '@/lib/definitions';
 import { shareTechMono } from '@/components/ui/fonts';
-
-const COMMANDS = [
-    { id: 'about', label: 'about' },
-    { id: 'experience', label: 'experience' },
-    { id: 'projects', label: 'projects' },
-    { id: 'skills', label: 'skills' },
-];
 
 export default function Home() {
     const [activeCommand, setActiveCommand] = useState<string | null>(null);
     const termRef = useRef<TerminalOutputHandle>(null);
+    const [expandedCommand, setExpandedCommand] = useState<string | null>(null);
+
+    useEffect(() => {
+    if (termRef.current) {
+        termRef.current.print(
+            <>
+                <span className="">[boot sequence initialized...]</span>
+                <br />
+                <div className="text-accent-med ms-5">loading cgaudino.os</div>
+                <div className="text-accent-med ms-5">mounting directories</div>
+                <div className="text-accent-med ms-5">system <span className='text-green-400'>online</span></div>
+                <div className="mt-2 ms-5">
+                    Welcome, click a folder to explore the filesystem.
+                </div>
+            </>
+        );
+    }
+}, []);
+
+    const toggleCommand = (id: string) => {
+        setExpandedCommand(prev => (prev === id ? null : id));
+    };
 
     const handleClick = () => {
         termRef.current?.print(
@@ -36,17 +51,42 @@ export default function Home() {
             <div className={`min-h-screen flex flex-col bg-beige-800 text-beige-300 ${shareTechMono.variable} font-primary`}>
                 <main className="flex-grow flex px-4 py-6 gap-4">
                     <div className="w-1/2">
-                        <h1 className='mb-2'>cristiano_gaudino/</h1>
+                        <h1 className='text-xl mb-2'>/cristiano_gaudino</h1>
                         <div className='space-y-2 ml-2'>
                             {COMMANDS.map(cmd => (
-                                <button
-                                    key={cmd.id}
-                                    // onClick={() => setActiveCommand(cmd.id)}
-                                    onClick={() => handleClick()}
-                                    className="block w-full text-left hover:text-beige-100 transition-colors"
-                                >
-                                    &gt;&gt; {cmd.label}
-                                </button>
+                                <div key={cmd.id}>
+                                    <button
+                                        onClick={() => toggleCommand(cmd.id)}
+                                        className="block w-full text-left hover:text-beige-100 transition-colors"
+                                    >
+                                        &gt;&gt; {cmd.id}
+                                    </button>
+
+                                    {expandedCommand === cmd.id && cmd.children && (
+                                        <div className="ml-4 space-y-1 pt-1">
+                                            {cmd.children.map(child => (
+                                            <button
+                                                key={child.id}
+                                                onClick={() => {
+                                                if (child.message) {
+                                                    termRef.current?.print(
+                                                    <span className="">{child.message}</span>
+                                                    );
+                                                } else {
+                                                    termRef.current?.print(
+                                                    <span className="">opening {child.id}...</span>
+                                                    );
+                                                    // You can later add type-specific behavior here
+                                                }
+                                                }}
+                                                className="text-sm text-beige-400 hover:text-beige-100 block text-left"
+                                            >
+                                                &gt; {child.id}
+                                            </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
                             ))}
                         </div>
                     </div>
