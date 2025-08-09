@@ -38,17 +38,17 @@ const TerminalOutput = forwardRef<TerminalOutputHandle>((_, ref) => {
 
     return (
         <div className="w-full overflow-hidden shadow-lg">
-            <div className="bg-accent-dark text-gray-300 font-mono px-4 py-2 select-none">
+            <div className="bg-purple-700 text-gray-300 px-4 py-2 select-none">
                 <span className="font-semibold">Output</span>
             </div>
 
             <div
                 ref={containerRef}
-                className="bg-black text-accent-light p-4 h-96 overflow-y-auto space-y-1 font-mono"
+                className="bg-black text-purple-400 p-4 h-96 overflow-y-auto space-y-1"
             >
                 {lines.map((line) => (
                     <div key={line.id}>
-                        <span className="text-accent-med">&gt; [{line.time}] </span>
+                        <span className="text-purple-500">&gt; [{line.time}] </span>
                         {line.content}
                     </div>
                 ))}

@@ -16,9 +16,16 @@
     --color-beige-700: #2a2a2a;
     --color-beige-800: #1e1e1e;
 
-    --color-accent-light: #A78BFA;
-    --color-accent-med: #4F518C;
-    --color-accent-dark: #2C2A4A;
+    --color-purple-50: #f3e8ff;
+    --color-purple-100: #e9d5ff;
+    --color-purple-200: #d8b4fe;
+    --color-purple-300: #A78BFA; /* accent-light */
+    --color-purple-400: #7F75D9;
+    --color-purple-500: #4F518C; /* accent-med */
+    --color-purple-600: #3E3D6F;
+    --color-purple-700: #2C2A4A; /* accent-dark */
+    --color-purple-800: #1F1E34;
+    --color-purple-900: #141322;
 
     /* Custom Breakpoints */
     --breakpoint-xs: 480px;

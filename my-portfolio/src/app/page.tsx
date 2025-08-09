@@ -17,12 +17,12 @@ export default function Home() {
     if (termRef.current) {
         termRef.current.print(
             <>
-                <span className="">[boot sequence initialized...]</span>
+                <span className="text-purple-300">[boot sequence initialized...]</span>
                 <br />
-                <div className="text-accent-med ms-5">loading cgaudino.os</div>
-                <div className="text-accent-med ms-5">mounting directories</div>
-                <div className="text-accent-med ms-5">system <span className='text-green-400'>online</span></div>
-                <div className="mt-2 ms-5">
+                {/* <div className="text-purple-500 ms-5">loading cgaudino.os</div>
+                <div className="text-purple-500 ms-5">mounting directories</div> */}
+                <div className="text-purple-500 ms-5">system <span className='text-green-400'>online</span></div>
+                <div className="text-purple-400 mt-2 ms-5">
                     Welcome, click a folder to explore the filesystem.
                 </div>
             </>
@@ -68,16 +68,16 @@ export default function Home() {
                                             <button
                                                 key={child.id}
                                                 onClick={() => {
-                                                if (child.message) {
-                                                    termRef.current?.print(
-                                                    <span className="">{child.message}</span>
-                                                    );
-                                                } else {
-                                                    termRef.current?.print(
-                                                    <span className="">opening {child.id}...</span>
-                                                    );
-                                                    // You can later add type-specific behavior here
-                                                }
+                                                    if (child.message) {
+                                                        termRef.current?.print(
+                                                            <span className="">{child.message}</span>
+                                                        );
+                                                    } else {
+                                                        termRef.current?.print(
+                                                            <span className="">opening {child.id}...</span>
+                                                        );
+                                                        // You can later add type-specific behavior here
+                                                    }
                                                 }}
                                                 className="text-sm text-beige-400 hover:text-beige-100 block text-left"
                                             >

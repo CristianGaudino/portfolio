@@ -1,3 +1,5 @@
+import React from 'react';
+
 // Props
 export interface TerminalModalProps {
     command: string;
@@ -40,15 +42,29 @@ export const COMMANDS = [
     {
         id: 'about',
         children: [
-            { id: 'bio.txt', type: 'txt', message: 'I am a full-stack developer with a love for clean code.' },
-            { id: 'contact.info', type: 'info', message: 'Reach out at: gaudino.cristian@gmail.com' },
+            { 
+                id: 'bio.txt',
+                type: 'txt',
+                message: 'I am a full-stack developer with a love for clean code.' 
+            },
+            { 
+                id: 'contact.info',
+                type: 'info',
+                message: 'Reach out at: gaudino.cristian@gmail.com' 
+            },
         ],
     },
     {
         id: 'experience',
         children: [
-            { id: 'resume.pdf', type: 'info', message: 'Opening resume.pdf... (Download or view in new tab coming soon)' },
-            { id: 'timeline.json', type: 'info', 
+            { 
+                id: 'resume.pdf', 
+                type: 'info', 
+                message: 'Opening resume.pdf... (Download or view in new tab coming soon)' 
+            },
+            { 
+                id: 'timeline.json', 
+                type: 'info', 
                 message: `{
                             "2021": "Joined Company A as Junior Developer",
                             "2023": "Promoted to Full-Stack Developer",
@@ -60,16 +76,36 @@ export const COMMANDS = [
     {
         id: 'projects',
         children: [
-            { id: 'antisocial.exe', type: 'exe', message: 'Launching Antisocial.exe... A minimalist productivity tool that blocks distractions.' },
-            { id: 'train_of_thought.exe', type: 'exe', message: 'Loading Train of Thought... An experimental idea-visualization engine.' },
-            { id: 'topdown.js', type: 'exe', message: 'Running topdown.js... A browser-based top-down game built with canvas.' },
+            { 
+                id: 'antisocial.exe', 
+                type: 'exe', 
+                message: 'Launching Antisocial.exe... A minimalist productivity tool that blocks distractions.' 
+            },
+            { 
+                id: 'train_of_thought.exe', 
+                type: 'exe', 
+                message: 'Loading Train of Thought... An experimental idea-visualization engine.' 
+            },
+            { 
+                id: 'topdown.js',
+                type: 'exe', 
+                message: 'Running topdown.js... A browser-based top-down game built with canvas.'
+            },
         ]
     },
     {
         id: 'skills',
         children: [
-            { id: 'soft_skills.txt', type: 'txt', message: ' Communication\n Problem Solving\n Team Collaboration\n Focus & Initiative' },
-            { id: 'tech_skils.txt', type: 'txt', message: 'React, Next.js, TypeScript, Tailwind CSS, Node.js, PostgreSQL, Python, PHP, Git, and more.' },
+            { 
+                id: 'soft_skills.txt', 
+                type: 'txt', 
+                message: ' Communication\n Problem Solving\n Team Collaboration\n Focus & Initiative' 
+            },
+            { 
+                id: 'tech_skils.txt', 
+                type: 'txt', 
+                message: 'React, Next.js, TypeScript, Tailwind CSS, Node.js, PostgreSQL, Python, PHP, Git, and more.' 
+            },
         ]
     },
 ];
