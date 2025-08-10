@@ -45,17 +45,17 @@ export const COMMANDS = [
                 id: 'bio.txt',
                 type: 'txt',
                 message: (
-                    <span className="text-beige-200">
+                    <span className="text-beige-300">
                             Cristiano Gaudino is an <span className="text-green-400">Irish</span> software engineer who builds sleek, responsive web applications that are just as elegant under the hood as they are on the surface.
                         
                         <p>
                             He&apos;s fluent in <span className="text-blue-400">Next.js</span>, <span className="text-blue-400">TypeScript</span>, and <span className="text-blue-400">Tailwind CSS</span>, and has a knack for turning complex backend systems into smooth, reliable engines.
                         </p>
                         <p>
-                            By day, he works on a <span className="text-yellow-300">product sourcing web platform</span>, weaving together UI/UX design, API integrations, and database wizardry. By night, he often has his head buried in a good book, recharging his creativity one page at a time.
+                            By day, he works on a <span className="text-yellow-300">product sourcing web platform</span> at JamJars, weaving together UI/UX design, API integrations, and database wizardry. By night, he often has his head buried in a good book, recharging his creativity one page at a time.
                         </p>
                         <p>
-                            Previously, he leveled up data tools at <span className="text-purple-300">ICBF</span>, transforming clunky legacy systems into real-time dashboards used by thousands of Irish farmers and labs. 
+                            Previously, he leveled up data tools at ICBF, transforming clunky legacy systems into real-time dashboards used by thousands of Irish farmers and labs. 
                         </p>
                         <p>
                             Cristiano is always up for a good challenge, a clean codebase, and a perfectly brewed espresso.
@@ -78,11 +78,6 @@ export const COMMANDS = [
                     </>
                 )
             },
-        ],
-    },
-    {
-        id: 'experience',
-        children: [
             {
                 id: 'resume.pdf',
                 type: 'info',
@@ -109,20 +104,70 @@ export const COMMANDS = [
                     </>
                 )
             },
-            { 
-                id: 'timeline.json', 
-                type: 'info', 
+        ],
+    },
+    {
+        id: 'experience',
+        children: [
+            {
+                id: 'education.txt',
+                type: 'txt',
                 message: (
-                    <pre className="text-green-300">
-                        {`{
-                            "2021": "Joined Company A as Junior Developer",
-                            "2023": "Promoted to Full-Stack Developer",
-                            "2024": "Launched Antisocial.exe project",
-                            "Present": "Engineering modern automotive web platform"
-                        }`}
-                    </pre>
+                    <>
+                        <span className='text-purple-500'>Opening <span className="text-purple-400">education.txt</span>...</span>
+                        <div className="space-y-3 mt-1">
+                            <div>
+                                <span className="text-purple-400">2017 - 2021</span> · <span className="text-green-400">B.Sc. Computer Science</span> @ <span className="text-blue-400">University College Cork</span>
+                                <ul className="list-disc ms-5 text-beige-300">
+                                    <li>Graduated with Second Class Honours (2.1).</li>
+                                    <li>Final year thesis: AI-Driven Football Betting System (scored 72%).</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <span className="text-purple-400">2016 - 2017</span> · <span className="text-green-400">Software Development</span> @ <span className="text-blue-400">Kerry College</span>
+                                <ul className="list-disc ms-5 text-beige-300">
+                                    <li>Awarded Distinction in all 9 modules.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </>
                 )
             },
+            {
+                id: 'work_experience.txt',
+                type: 'txt',
+                message: (
+                    <>
+                        <span className='text-purple-500'>Opening <span className="text-purple-400">work_experience.txt</span>...</span>
+                        <div className="space-y-3 mt-1">
+                            <div>
+                                <span className="text-purple-400">Nov 2024 - Present</span> · <span className="text-green-400">Full Stack Software Engineer</span> @ <span className="text-blue-400">JamJars</span>
+                                <ul className="list-disc ms-5 text-beige-300">
+                                    <li>Building a modern automotive platform with Next.js, TypeScript, Tailwind CSS, and PostgreSQL.</li>
+                                    <li>Working in an agile team, delivering functional prototypes under tight deadlines.</li>
+                                    <li>Collaborating with stakeholders to turn evolving requirements into technical solutions.</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <span className="text-purple-400">Jul 2023 - Jul 2024</span> · <span className="text-green-400">Graduate Software Engineer</span> @ <span className="text-blue-400">ICBF</span>
+                                <ul className="list-disc ms-5 text-beige-300">
+                                    <li>Optimised a high-volume Oracle database using PL/SQL.</li>
+                                    <li>Modernised legacy PHP & JS tools, adding features that grew user base by 1,000+.</li>
+                                    <li>Built real-time dashboards reducing critical issue resolution from 12 days to 3.</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <span className="text-purple-400">Nov 2021 - Jul 2023</span> · <span className="text-green-400">Software Developer</span> @ <span className="text-blue-400">Cartwright</span>
+                                <ul className="list-disc ms-5 text-beige-300">
+                                    <li>Developed a responsive car dealership site in React.</li>
+                                    <li>Integrated APIs to automate vehicle inventory updates.</li>
+                                    <li>Improved search, filtering, and admin tools post-launch.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </>
+                )
+            }
         ]
     },
     {
