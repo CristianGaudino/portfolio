@@ -47,9 +47,13 @@ const TerminalOutput = forwardRef<TerminalOutputHandle>((_, ref) => {
                 className="bg-black text-purple-400 p-4 h-96 overflow-y-auto space-y-1"
             >
                 {lines.map((line) => (
-                    <div key={line.id}>
-                        <span className="text-purple-500">&gt; [{line.time}] </span>
-                        {line.content}
+                    <div key={line.id} className="flex items-start">
+                        <span className="text-purple-500 shrink-0">
+                            &gt;
+                        </span>
+                        <div className="ml-2 break-words">
+                            <span className="text-purple-500 shrink-0">[{line.time}]</span> {line.content}
+                        </div>
                     </div>
                 ))}
             </div>
