@@ -7,6 +7,7 @@ import { FaGithub, FaLinkedin } from 'react-icons/fa6';
 import TerminalOutput from '@/components/ui/terminal-output';
 import { COMMANDS, TerminalOutputHandle } from '@/lib/definitions';
 import { shareTechMono } from '@/components/ui/fonts';
+import { BsFileEarmarkCode, BsFileEarmarkPdf, BsFileEarmarkPerson, BsFileEarmarkText } from 'react-icons/bs';
 
 export default function Home() {
     const [activeCommand, setActiveCommand] = useState<string | null>(null);
@@ -14,33 +15,19 @@ export default function Home() {
     const [expandedCommand, setExpandedCommand] = useState<string | null>(null);
 
     useEffect(() => {
-    if (termRef.current) {
-        termRef.current.print(
-            <>
-                <span className="text-purple-500">[boot sequence initialized...]</span>
-                <div className="text-purple-500">cgaudino.os <span className='text-green-400'>online</span></div>
-                <div className="text-purple-400">
-                    Welcome, click a folder to explore the filesystem.
-                </div>
-            </>
-        );
-    }
-}, []);
+        if (termRef.current) {
+            termRef.current.print(
+                <>
+                    <span className="text-purple-500">[boot sequence initialized...]</span>
+                    <div className="text-purple-500">cgaudino.os <span className='text-green-400'>online</span></div>
+                    <div className="text-purple-400">Welcome, click a folder to explore the filesystem.</div>
+                </>
+            );
+        }
+    }, []);
 
     const toggleCommand = (id: string) => {
         setExpandedCommand(prev => (prev === id ? null : id));
-    };
-
-    const handleClick = () => {
-        termRef.current?.print(
-            <>
-                This is a message with a{" "}
-                <a href="https://example.com" target="_blank" rel="noopener noreferrer" className="underline text-blue-400">
-                    link
-                </a>
-                .
-            </>
-        );
     };
 
     return (
@@ -71,12 +58,18 @@ export default function Home() {
                                                         termRef.current?.print(
                                                             <span className="">opening {child.id}...</span>
                                                         );
-                                                        // You can later add type-specific behavior here
+                                                        // type-specific behaviour can be added here
                                                     }
                                                 }}
                                                 className="text-sm text-beige-400 hover:text-beige-100 block text-left"
                                             >
-                                                &gt; {child.id}
+                                                <span className="flex items-center gap-1">
+                                                    {child.type === 'txt' && <BsFileEarmarkText className="text-blue-400" />}
+                                                    {child.type === 'info' && <BsFileEarmarkPerson className="text-yellow-400" />}
+                                                    {child.type === 'exe' && <BsFileEarmarkCode className="text-green-400" />}
+                                                    {child.type === 'pdf' && <BsFileEarmarkPdf className="text-red-400" />}
+                                                    {child.id}
+                                                </span>
                                             </button>
                                             ))}
                                         </div>

@@ -23,7 +23,7 @@ export interface FileNode {
 
 // Types
 
-export type FileType = 'exe' | 'txt' | 'info' | 'dll' | 'folder';
+export type FileType = 'exe' | 'txt' | 'info' | 'pdf';
 
 export type TerminalOutputHandle = {
     print: (content: React.ReactNode) => void;
@@ -77,7 +77,7 @@ export const COMMANDS = [
             },
             {
                 id: 'resume.pdf',
-                type: 'info',
+                type: 'pdf',
                 message: (
                     <>
                         <span className='text-purple-500'>Opening <span className="text-purple-400">resume.pdf</span>...</span>
