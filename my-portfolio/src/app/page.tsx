@@ -19,8 +19,6 @@ export default function Home() {
             <>
                 <span className="text-purple-300">[boot sequence initialized...]</span>
                 <br />
-                {/* <div className="text-purple-500 ms-5">loading cgaudino.os</div>
-                <div className="text-purple-500 ms-5">mounting directories</div> */}
                 <div className="text-purple-500 ms-5">system <span className='text-green-400'>online</span></div>
                 <div className="text-purple-400 mt-2 ms-5">
                     Welcome, click a folder to explore the filesystem.
@@ -69,9 +67,7 @@ export default function Home() {
                                                 key={child.id}
                                                 onClick={() => {
                                                     if (child.message) {
-                                                        termRef.current?.print(
-                                                            <span className="">{child.message}</span>
-                                                        );
+                                                        termRef.current?.print(child.message);
                                                     } else {
                                                         termRef.current?.print(
                                                             <span className="">opening {child.id}...</span>
