@@ -48,16 +48,16 @@ export const COMMANDS = [
                     <span className="text-beige-200">
                             Cristiano Gaudino is an <span className="text-green-400">Irish</span> software engineer who builds sleek, responsive web applications that are just as elegant under the hood as they are on the surface.
                         
-                        <p className="">
+                        <p>
                             He&apos;s fluent in <span className="text-blue-400">Next.js</span>, <span className="text-blue-400">TypeScript</span>, and <span className="text-blue-400">Tailwind CSS</span>, and has a knack for turning complex backend systems into smooth, reliable engines.
                         </p>
-                        <p className="">
+                        <p>
                             By day, he works on a <span className="text-yellow-300">product sourcing web platform</span>, weaving together UI/UX design, API integrations, and database wizardry. By night, he often has his head buried in a good book, recharging his creativity one page at a time.
                         </p>
-                        <p className="">
+                        <p>
                             Previously, he leveled up data tools at <span className="text-purple-300">ICBF</span>, transforming clunky legacy systems into real-time dashboards used by thousands of Irish farmers and labs. 
                         </p>
-                        <p className="">
+                        <p>
                             Cristiano is always up for a good challenge, a clean codebase, and a perfectly brewed espresso.
                         </p>
                     </span>
@@ -114,12 +114,12 @@ export const COMMANDS = [
                 type: 'info', 
                 message: (
                     <pre className="text-green-300">
-{`{
-    "2021": "Joined Company A as Junior Developer",
-    "2023": "Promoted to Full-Stack Developer",
-    "2024": "Launched Antisocial.exe project",
-    "Present": "Engineering modern automotive web platform"
-}`}
+                        {`{
+                            "2021": "Joined Company A as Junior Developer",
+                            "2023": "Promoted to Full-Stack Developer",
+                            "2024": "Launched Antisocial.exe project",
+                            "Present": "Engineering modern automotive web platform"
+                        }`}
                     </pre>
                 )
             },
@@ -133,18 +133,23 @@ export const COMMANDS = [
                 type: 'exe', 
                 message: (
                     <>
-                        Launching <span className="text-yellow-400">Antisocial.exe</span>...  
-                        <br />A minimalist productivity tool that blocks distractions and helps you stay focused.
-                    </>
-                )
-            },
-            { 
-                id: 'train_of_thought.exe', 
-                type: 'exe', 
-                message: (
-                    <>
-                        Loading <span className="text-yellow-400">Train of Thought</span>...  
-                        <br />An experimental visualization engine for mapping complex ideas in real time.
+                        <span className=''>
+                            anti-social{' '}
+                            <a
+                                href="https://antisocial.cgaudino.com"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-green-400"
+                            >
+                                [RUN]
+                            </a>
+                        </span>
+                        <p className="text-beige-300">
+                            Anti-social is an anti-social media platform designed to provide users with a non-addictive, scrollable feed based on expressed interests across different forms of media.
+                        </p>
+                        <p className="text-purple-500">
+                            This platform is still in development; however, a working prototype is available.
+                        </p>
                     </>
                 )
             },
@@ -153,8 +158,32 @@ export const COMMANDS = [
                 type: 'exe', 
                 message: (
                     <>
-                        Running <span className="text-yellow-400">topdown.js</span>...  
-                        <br />A browser-based top-down adventure game built with HTML5 Canvas.
+                        <span>
+                            topdown.js <span className="text-red-400 cursor-not-allowed">[RUN]</span>
+                        </span>
+                        <p className="text-beige-300">
+                            A browser-based top-down game built with HTML5 canvas, featuring dynamic enemy AI and procedurally generated levels.
+                        </p>
+                        <p className="text-purple-500">
+                            Currently in development and not publicly available.
+                        </p>
+                    </>
+                )
+            },
+            { 
+                id: 'train_of_thought.exe', 
+                type: 'exe', 
+                message: (
+                    <>
+                        <span>
+                            train_of_thought.exe <span className="text-red-400 cursor-not-allowed">[RUN]</span>
+                        </span>
+                        <p className="text-beige-300">
+                            Train of Thought is an experimental idea-visualization engine, designed to map and connect concepts in real-time.
+                        </p>
+                        <p className="text-purple-500">
+                            Currently in development and not publicly available.
+                        </p>
                     </>
                 )
             },

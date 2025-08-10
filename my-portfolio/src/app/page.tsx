@@ -17,10 +17,9 @@ export default function Home() {
     if (termRef.current) {
         termRef.current.print(
             <>
-                <span className="text-purple-300">[boot sequence initialized...]</span>
-                <br />
-                <div className="text-purple-500 ms-5">system <span className='text-green-400'>online</span></div>
-                <div className="text-purple-400 mt-2 ms-5">
+                <span className="text-purple-500">[boot sequence initialized...]</span>
+                <div className="text-purple-500">cgaudino.os <span className='text-green-400'>online</span></div>
+                <div className="text-purple-400">
                     Welcome, click a folder to explore the filesystem.
                 </div>
             </>
