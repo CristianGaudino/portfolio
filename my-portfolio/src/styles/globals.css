@@ -31,19 +31,9 @@
     --breakpoint-xs: 480px;
 }
 
-/* @layer utilities {
-    .font-primary {
-      font-family: var(--font-primary);
-    }
-} */
-
 @layer base {
     button:not(:disabled),
     [role="button"]:not(:disabled) {
         cursor: pointer;
     }
-
-    /* input, textarea, select {
-        @apply border border-gray-300 focus:outline focus:outline-sky-500;
-    } */
 }
