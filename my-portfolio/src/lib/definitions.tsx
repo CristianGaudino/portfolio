@@ -45,22 +45,19 @@ export const COMMANDS = [
                 id: 'bio.txt',
                 type: 'txt',
                 message: (
-                    <span className="text-beige-300">
+                    <>
+                        <span className='text-purple-500'>Opening <span className="text-purple-400">tech_skills.txt</span>...</span>    
+                        <div className="text-beige-300">
                             Cristiano Gaudino is an <span className="text-green-400">Irish</span> software engineer who builds sleek, responsive web applications that are just as elegant under the hood as they are on the surface.
-                        
-                        <p>
                             He&apos;s fluent in <span className="text-blue-400">Next.js</span>, <span className="text-blue-400">TypeScript</span>, and <span className="text-blue-400">Tailwind CSS</span>, and has a knack for turning complex backend systems into smooth, reliable engines.
-                        </p>
-                        <p>
+                            <br/>
                             By day, he works on a <span className="text-yellow-300">product sourcing web platform</span> at JamJars, weaving together UI/UX design, API integrations, and database wizardry. By night, he often has his head buried in a good book, recharging his creativity one page at a time.
-                        </p>
-                        <p>
                             Previously, he leveled up data tools at ICBF, transforming clunky legacy systems into real-time dashboards used by thousands of Irish farmers and labs. 
-                        </p>
-                        <p>
+                            <br/>
                             Cristiano is always up for a good challenge, a clean codebase, and a perfectly brewed espresso.
-                        </p>
-                    </span>
+                            
+                        </div>
+                    </>
                 )
             },
             { 
