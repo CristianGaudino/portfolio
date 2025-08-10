@@ -88,7 +88,7 @@ export const COMMANDS = [
                 type: 'info',
                 message: (
                     <>
-                        Opening <span className="text-purple-300">resume.pdf</span>...
+                        <span className='text-purple-500'>Opening <span className="text-purple-400">resume.pdf</span>...</span>
                         <br />
                         <a
                             href="/resume.pdf"
@@ -176,7 +176,7 @@ export const COMMANDS = [
                 message: (
                     <>
                         <span>
-                            train_of_thought.exe <span className="text-red-400 cursor-not-allowed">[RUN]</span>
+                            Train of Thought <span className="text-red-400 cursor-not-allowed">[RUN]</span>
                         </span>
                         <p className="text-beige-300">
                             Train of Thought is an experimental idea-visualization engine, designed to map and connect concepts in real-time.
@@ -196,30 +196,49 @@ export const COMMANDS = [
                 id: 'soft_skills.txt', 
                 type: 'txt', 
                 message: (
-                    <ul className="list-disc ml-5 text-green-300">
-                        <li>Clear Communication</li>
-                        <li>Problem Solving</li>
-                        <li>Team Collaboration</li>
-                        <li>Focus &amp; Initiative</li>
-                        <li>Adaptability</li>
-                    </ul>
+                    <>
+                        <span className='text-purple-500'>Opening <span className="text-purple-400">soft_skills.txt</span>...</span>
+                        <ul className="list-disc ms-5 text-green-300">
+                            <li>Clear Communication</li>
+                            <li>Problem Solving</li>
+                            <li>Team Collaboration</li>
+                            <li>Focus &amp; Initiative</li>
+                            <li>Adaptability</li>
+                        </ul>
+                    </>
                 )
             },
             { 
-                id: 'tech_skils.txt', 
+                id: 'tech_skills.txt', 
                 type: 'txt', 
                 message: (
                     <>
-                        <span className="text-blue-400">Frontend:</span> React, Next.js, TypeScript, Tailwind CSS  
-                        <br />
-                        <span className="text-blue-400">Backend:</span> Node.js, PostgreSQL, PHP, Python  
-                        <br />
-                        <span className="text-blue-400">Other:</span> Git, Agile Development, API Design
+                        <span className='text-purple-500'>Opening <span className="text-purple-400">tech_skills.txt</span>...</span>
+                        <p>
+                            <span className="text-blue-400 w-28 inline-block">Languages:</span>
+                            TypeScript, JavaScript, PHP, PL/SQL, SQL, Python, HTML, CSS
+                        </p>
+                        <p>
+                            <span className="text-blue-400 w-28 inline-block">Frontend:</span>
+                            Next.js, React, Tailwind CSS, Bootstrap 5, JQuery
+                        </p>
+                        <p>
+                            <span className="text-blue-400 w-28 inline-block">Backend:</span>
+                            Node.js, PostgreSQL, Oracle, Laminas PHP
+                        </p>
+                        <p>
+                            <span className="text-blue-400 w-28 inline-block">Tools:</span>
+                            Git, Vercel, Neon
+                        </p>
+                        <p>
+                            <span className="text-blue-400 w-28 inline-block">Other:</span>
+                            Agile Development, AI Development
+                        </p>
                     </>
                 )
             },
         ]
-    },
+    }
 ];
 
 export const SKILLS = [
