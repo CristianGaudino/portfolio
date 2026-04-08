@@ -51,11 +51,11 @@ export const COMMANDS = [
                             Cristiano Gaudino is an <span className="text-green-400">Irish</span> software engineer who builds sleek, responsive web applications that are just as elegant under the hood as they are on the surface.
                             He&apos;s fluent in <span className="text-blue-400">Next.js</span>, <span className="text-blue-400">TypeScript</span>, and <span className="text-blue-400">Tailwind CSS</span>, and has a knack for turning complex backend systems into smooth, reliable engines.
                             <br/>
-                            By day, he works on a <span className="text-yellow-300">product sourcing web platform</span> at JamJars, weaving together UI/UX design, API integrations, and database wizardry. By night, he often has his head buried in a good book, recharging his creativity one page at a time.
-                            Previously, he leveled up data tools at ICBF, transforming clunky legacy systems into real-time dashboards used by thousands of Irish farmers and labs. 
+                            Currently, he works as an <span className="text-yellow-300">Application Developer</span> at SMBC Group. Previously, he built a product and materials sourcing platform at JamJars and leveled up data tools at ICBF, transforming clunky legacy systems into real-time dashboards used by thousands of Irish farmers and labs.
+                            By night, he often has his head buried in a good book, recharging his creativity one page at a time.
                             <br/>
                             Cristiano is always up for a good challenge, a clean codebase, and a perfectly brewed espresso.
-                            
+
                         </div>
                     </>
                 )
@@ -138,11 +138,17 @@ export const COMMANDS = [
                         <span className='text-purple-500'>Opening <span className="text-purple-400">work_experience.txt</span>...</span>
                         <div className="space-y-3 mt-1">
                             <div>
-                                <span className="text-purple-400">Nov 2024 - Present</span> · <span className="text-green-400">Full Stack Software Engineer</span> @ <span className="text-blue-400">JamJars</span>
+                                <span className="text-purple-400">Feb 2026 - Present</span> · <span className="text-green-400">Application Developer</span> @ <span className="text-blue-400">SMBC Group</span>
                                 <ul className="list-disc ms-5 text-beige-300">
-                                    <li>Building a modern automotive platform with Next.js, TypeScript, Tailwind CSS, and PostgreSQL.</li>
+                                    <li>Application development within a global financial institution.</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <span className="text-purple-400">Nov 2024 - Nov 2025</span> · <span className="text-green-400">Full Stack Software Engineer</span> @ <span className="text-blue-400">JamJars</span>
+                                <ul className="list-disc ms-5 text-beige-300">
+                                    <li>Built a product and materials sourcing platform with Next.js, TypeScript, Tailwind CSS, and PostgreSQL.</li>
                                     <li>Working in an agile team, delivering functional prototypes under tight deadlines.</li>
-                                    <li>Collaborating with stakeholders to turn evolving requirements into technical solutions.</li>
+                                    <li>Collaborated with stakeholders to turn evolving requirements into technical solutions.</li>
                                 </ul>
                             </div>
                             <div>
@@ -159,6 +165,15 @@ export const COMMANDS = [
                                     <li>Developed a responsive car dealership site in React.</li>
                                     <li>Integrated APIs to automate vehicle inventory updates.</li>
                                     <li>Improved search, filtering, and admin tools post-launch.</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <span className="text-purple-400">2020</span> · <span className="text-green-400">Enterprise Systems Group Intern</span> @ <span className="text-blue-400">JRI America Inc.</span>
+                                <ul className="list-disc ms-5 text-beige-300">
+                                    <li>Maintained a fleet of Unix/RHEL servers, ensuring stability and compliance.</li>
+                                    <li>Developed Ansible/YAML automation scripts to streamline server administration.</li>
+                                    <li>Contributed to server migration automation, reducing manual overhead.</li>
+                                    <li>Tested scripts and deployment procedures before production release.</li>
                                 </ul>
                             </div>
                         </div>
@@ -195,36 +210,46 @@ export const COMMANDS = [
                     </>
                 )
             },
-            { 
-                id: 'topdown.js',
-                type: 'exe', 
+            {
+                id: 'topdown.ts',
+                type: 'exe',
                 message: (
                     <>
                         <span>
-                            topdown.js <span className="text-red-400 cursor-not-allowed">[RUN]</span>
+                            topdown.ts{' '}
+                            <a
+                                href="https://www.topdown.cgaudino.com"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-green-400"
+                            >
+                                [RUN]
+                            </a>
                         </span>
                         <p className="text-beige-300">
                             A browser-based top-down game built with HTML5 canvas, featuring dynamic enemy AI and procedurally generated levels.
                         </p>
-                        <p className="text-purple-500">
-                            Currently in development and not publicly available.
-                        </p>
                     </>
                 )
             },
-            { 
-                id: 'train_of_thought.exe', 
-                type: 'exe', 
+            {
+                id: 'train_of_thought.exe',
+                type: 'exe',
                 message: (
                     <>
                         <span>
-                            Train of Thought <span className="text-red-400 cursor-not-allowed">[RUN]</span>
+                            Train of Thought{' '}
+                            <a
+                                href="https://www.trainofthought.cgaudino.com"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-green-400"
+                            >
+                                [RUN]
+                            </a>
                         </span>
                         <p className="text-beige-300">
                             Train of Thought is an experimental idea-visualization engine, designed to map and connect concepts in real-time.
-                        </p>
-                        <p className="text-purple-500">
-                            Currently in development and not publicly available.
                         </p>
                     </>
                 )

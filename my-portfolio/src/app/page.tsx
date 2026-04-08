@@ -24,6 +24,7 @@ export default function Home() {
                     <span className="text-purple-500">[boot sequence initialized...]</span>
                     <div className="text-purple-500">cgaudino.os <span className='text-green-400'>online</span></div>
                     <div className="text-purple-400">Welcome, click a folder to explore the filesystem.</div>
+                    <div className="text-yellow-600 text-xs">Note: some information on this site may be outdated.</div>
                 </>
             );
         }

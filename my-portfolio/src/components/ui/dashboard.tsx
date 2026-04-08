@@ -94,7 +94,7 @@ export function Dashboard() {
 
             {/* Last Commit */}
             <div className="text-sm w-full text-center">
-                <span className="text-purple-300 mr-1">Last Commit:</span>2025-08-01
+                <span className="text-purple-300 mr-1">Last Commit:</span>2026-04-08
             </div>
 
             {/* Active Process */}
