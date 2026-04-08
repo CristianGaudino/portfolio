@@ -27,6 +27,7 @@ export type FileType = 'exe' | 'txt' | 'info' | 'pdf';
 
 export type TerminalOutputHandle = {
     print: (content: React.ReactNode) => void;
+    clear: () => void;
 };
 
 export type TerminalLine = {
