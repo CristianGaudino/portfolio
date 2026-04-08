@@ -3,11 +3,36 @@
 import { TerminalLine, TerminalOutputHandle } from "@/lib/definitions";
 import React, {
     useState,
+    useEffect,
     useImperativeHandle,
     forwardRef,
     useRef,
     useLayoutEffect,
 } from "react";
+
+function TypingContent({ node }: { node: React.ReactNode }) {
+    const items = React.isValidElement(node) && node.type === React.Fragment
+        ? React.Children.toArray((node.props as { children: React.ReactNode }).children)
+        : [node];
+
+    const [revealed, setRevealed] = useState(0);
+
+    useEffect(() => {
+        if (revealed >= items.length) return;
+        const delay = revealed === 0 ? 50 : 130;
+        const timer = setTimeout(() => setRevealed(r => r + 1), delay);
+        return () => clearTimeout(timer);
+    }, [revealed, items.length]);
+
+    return (
+        <>
+            {items.slice(0, revealed)}
+            {revealed < items.length && (
+                <span className="inline-block w-2 h-[0.9em] bg-purple-400 opacity-80 animate-pulse align-middle ml-0.5" />
+            )}
+        </>
+    );
+}
 
 
 const TerminalOutput = forwardRef<TerminalOutputHandle>((_, ref) => {
@@ -52,7 +77,8 @@ const TerminalOutput = forwardRef<TerminalOutputHandle>((_, ref) => {
                             &gt;
                         </span>
                         <div className="ml-2 break-words">
-                            <span className="text-purple-500 shrink-0">[{line.time}]</span> {line.content}
+                            <span className="text-purple-500 shrink-0">[{line.time}]</span>{' '}
+                            <TypingContent node={line.content} />
                         </div>
                     </div>
                 ))}
