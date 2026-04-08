@@ -140,7 +140,7 @@ export const COMMANDS = [
                             <div>
                                 <span className="text-purple-400">Feb 2026 - Present</span> · <span className="text-green-400">Application Developer</span> @ <span className="text-blue-400">SMBC Group</span>
                                 <ul className="list-disc ms-5 text-beige-300">
-                                    <li>Application development within a global financial institution.</li>
+                                    <li>Building corporate banking applications using React, Vite, and TypeScript.</li>
                                 </ul>
                             </div>
                             <div>
@@ -193,7 +193,7 @@ export const COMMANDS = [
                         <span className=''>
                             anti-social{' '}
                             <a
-                                href="https://antisocial.cgaudino.com"
+                                href="https://www.antisocial.cgaudino.com"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-green-400"
