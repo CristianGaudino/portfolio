@@ -97,8 +97,8 @@ export default function Home() {
             {!booted && <BootScreen onDone={() => setBooted(true)} />}
 
             <div className={`flex h-full flex-col ${booted ? 'crt-power-on' : 'invisible'}`}>
-                {/* Mobile toggle */}
-                <div className="sm:hidden shrink-0 flex justify-center gap-2 border-b border-beige-700 bg-beige-900 px-4 py-2 text-sm">
+                {/* Files / dashboard toggle — shown until there's room for both side by side */}
+                <div className="lg:hidden shrink-0 flex justify-center gap-2 border-b border-beige-700 bg-beige-900 px-4 py-2 text-sm">
                     {(['files', 'dashboard'] as const).map(view => (
                         <button
                             key={view}
@@ -118,7 +118,7 @@ export default function Home() {
                     {/* File tree */}
                     <Window
                         title="~/cristiano_gaudino"
-                        className={`w-full sm:w-1/2 ${xsView === 'files' ? 'flex' : 'hidden'} sm:flex`}
+                        className={`w-full lg:w-1/2 ${xsView === 'files' ? 'flex' : 'hidden'} lg:flex`}
                         bodyClassName="overflow-y-auto p-4"
                     >
                         <div className="space-y-1.5">
@@ -168,7 +168,7 @@ export default function Home() {
                     {/* Dashboard */}
                     <Window
                         title="system-monitor"
-                        className={`w-full sm:w-1/2 ${xsView === 'dashboard' ? 'flex' : 'hidden'} sm:flex`}
+                        className={`w-full lg:w-1/2 ${xsView === 'dashboard' ? 'flex' : 'hidden'} lg:flex`}
                         bodyClassName="flex overflow-hidden"
                     >
                         <Dashboard />

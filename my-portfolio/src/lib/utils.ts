@@ -1,4 +1,4 @@
-import { TASKS_BY_STATUS } from "./definitions";
+import { SITE_CONFIG } from "./config";
 
 export function toTitleCase(str: string) {
     return str
@@ -6,72 +6,95 @@ export function toTitleCase(str: string) {
         .replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
-const BIRTH_DATE = new Date("1999-03-26T00:00:00Z");
+const BIRTH_DATE = new Date(`${SITE_CONFIG.birthDate}T00:00:00Z`);
+const CAREER_START = new Date(`${SITE_CONFIG.careerStart}T00:00:00Z`);
 
+/** Playful version string: years.months lived, e.g. `v27.6`. */
 export function getVersion() {
     const now = new Date();
-    const years = now.getUTCFullYear() - BIRTH_DATE.getUTCFullYear();
-    const months =
-        now.getUTCMonth() - BIRTH_DATE.getUTCMonth() < 0
-            ? 12 + now.getUTCMonth() - BIRTH_DATE.getUTCMonth()
-            : now.getUTCMonth() - BIRTH_DATE.getUTCMonth();
-
-    return {
-        version: `v${years}.${months}`,
-    };
-}
-
-export function getUptimeInSeconds(): number {
-    return Math.floor((Date.now() - BIRTH_DATE.getTime()) / 1000);
-}
-
-export function getDevStatus() {
-    const hour = new Date().getHours();
-    let status = "";
-    let color = "";
-
-    // if (hour < 6) {
-    //     status = "offline";
-    //     color = "text-red-500";
-    // } else if (hour < 9) {
-    //     status = "booting";
-    //     color = "text-yellow-400";
-    // } else if (hour < 18) {
-    //     status = "active";
-    //     color = "text-green-500";
-    // } else if (hour < 22) {
-    //     status = "idle";
-    //     color = "text-blue-400";
-    // } else {
-    //     status = "standby";
-    //     color = "text-orange-400";
-    // }
-
-    if (hour < 7) {
-        status = "offline";
-        color = "text-red-500";
-    } else if (hour < 18) {
-        status = "active";
-        color = "text-green-500";
-    } else {
-        status = "idle";
-        color = "text-yellow-400";
+    let years = now.getUTCFullYear() - BIRTH_DATE.getUTCFullYear();
+    let months = now.getUTCMonth() - BIRTH_DATE.getUTCMonth();
+    if (now.getUTCDate() < BIRTH_DATE.getUTCDate()) months -= 1;
+    if (months < 0) {
+        years -= 1;
+        months += 12;
     }
+    return { version: `v${years}.${months}` };
+}
 
-    return { status, color };
+export function getCareerUptimeSeconds(): number {
+    return Math.floor((Date.now() - CAREER_START.getTime()) / 1000);
+}
+
+/** `4y 271d 04:12:33` */
+export function formatUptime(totalSeconds: number): string {
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const days = Math.floor(totalSeconds / 86_400);
+    const years = Math.floor(days / 365);
+    const h = Math.floor((totalSeconds % 86_400) / 3_600);
+    const m = Math.floor((totalSeconds % 3_600) / 60);
+    const s = totalSeconds % 60;
+    return `${years}y ${days % 365}d ${pad(h)}:${pad(m)}:${pad(s)}`;
+}
+
+/** Relative time like `6h ago`, `3d ago`. */
+export function formatRelative(iso: string): string {
+    const seconds = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+    if (seconds < 45) return 'just now';
+    const mins = Math.floor(seconds / 60);
+    if (mins < 60) return `${mins}m ago`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    if (days < 30) return `${days}d ago`;
+    const months = Math.floor(days / 30);
+    if (months < 12) return `${months}mo ago`;
+    return `${Math.floor(months / 12)}y ago`;
+}
+
+function hourInTimezone(tz: string): number {
+    const value = new Intl.DateTimeFormat('en-US', {
+        timeZone: tz,
+        hour: 'numeric',
+        hour12: false,
+    }).formatToParts(new Date()).find((p) => p.type === 'hour')?.value ?? '0';
+    return parseInt(value, 10) % 24;
+}
+
+export type DevStatus = 'active' | 'idle' | 'offline';
+
+const STATUS_COLOR: Record<DevStatus, string> = {
+    active: 'text-term-green',
+    idle: 'text-term-amber',
+    offline: 'text-term-red',
+};
+
+export function getDevStatus(): { status: DevStatus; color: string } {
+    const hour = hourInTimezone(SITE_CONFIG.timezone);
+    const { activeStart, idleStart, offlineStart } = SITE_CONFIG.statusHours;
+
+    let status: DevStatus;
+    if (hour >= activeStart && hour < idleStart) status = 'active';
+    else if (hour >= idleStart && hour < offlineStart) status = 'idle';
+    else status = 'offline';
+
+    return { status, color: STATUS_COLOR[status] };
+}
+
+/** Wall-clock time in the host timezone, e.g. `14:07`. */
+export function getLocalTime(tz: string = SITE_CONFIG.timezone): string {
+    return new Intl.DateTimeFormat('en-GB', {
+        timeZone: tz,
+        hour: '2-digit',
+        minute: '2-digit',
+    }).format(new Date());
 }
 
 // Returns professional years rounded to the nearest 0.5
 export function getProfessionalYears(): number {
-    const startDate = new Date("2021-01-01T00:00:00Z");
     const now = new Date();
-    const diffMonths = (now.getFullYear() - startDate.getFullYear()) * 12 + (now.getMonth() - startDate.getMonth());
+    const diffMonths =
+        (now.getUTCFullYear() - CAREER_START.getUTCFullYear()) * 12 +
+        (now.getUTCMonth() - CAREER_START.getUTCMonth());
     return Math.round((diffMonths / 12) * 2) / 2;
-}
-
-export function getTaskByStatus(status: string) {
-    const taskList = TASKS_BY_STATUS[status] || ["reading.md"];
-    const task = taskList[Math.floor(Math.random() * taskList.length)];
-    const pid = Math.floor(Math.random() * 9000 + 1000); // PID 1000–9999
-    return { task, pid };
 }

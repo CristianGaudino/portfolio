@@ -1,7 +1,24 @@
 import type { NextConfig } from "next";
+import { execSync } from "node:child_process";
+
+/** Resolve the current commit for the build-info readout in the dashboard. */
+function gitSha(): string {
+  if (process.env.VERCEL_GIT_COMMIT_SHA) return process.env.VERCEL_GIT_COMMIT_SHA.slice(0, 7);
+  try {
+    return execSync("git rev-parse --short HEAD", { stdio: ["ignore", "pipe", "ignore"] })
+      .toString()
+      .trim();
+  } catch {
+    return "dev";
+  }
+}
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  env: {
+    NEXT_PUBLIC_GIT_SHA: gitSha(),
+    NEXT_PUBLIC_GIT_REF: process.env.VERCEL_GIT_COMMIT_REF ?? "local",
+    NEXT_PUBLIC_BUILD_TIME: new Date().toISOString(),
+  },
 };
 
 export default nextConfig;

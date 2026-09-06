@@ -51,6 +51,47 @@ export type TerminalLine = {
     content: React.ReactNode;
 };
 
+// Shared presentational helpers for file contents — keep colour + rhythm in one place.
+
+const OpenLine = ({ name }: { name: string }) => (
+    <span className="text-purple-500">
+        Opening <span className="text-purple-300">{name}</span>…
+    </span>
+);
+
+const Prose = ({ children }: { children: React.ReactNode }) => (
+    <div className="mt-1 max-w-[62ch] space-y-2 leading-relaxed text-beige-300">{children}</div>
+);
+
+const ExtLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
+    <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-term-blue underline underline-offset-2 hover:opacity-80"
+    >
+        {children}
+    </a>
+);
+
+const RunLink = ({ href }: { href: string }) => (
+    <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-term-green hover:opacity-80"
+    >
+        [RUN]
+    </a>
+);
+
+const Role = ({ dates, title, org }: { dates: string; title: string; org: string }) => (
+    <>
+        <span className="text-purple-300">{dates}</span> · <span className="text-term-green">{title}</span> @{' '}
+        <span className="text-term-blue">{org}</span>
+    </>
+);
+
 // Const
 
 export const COMMANDS: CommandFolder[] = [
@@ -62,32 +103,33 @@ export const COMMANDS: CommandFolder[] = [
                 type: 'txt',
                 message: (
                     <>
-                        <span className='text-purple-500'>Opening <span className="text-purple-400">tech_skills.txt</span>...</span>    
-                        <div className="text-beige-300">
-                            Cristiano Gaudino is an <span className="text-green-400">Irish</span> software engineer who builds sleek, responsive web applications that are just as elegant under the hood as they are on the surface.
-                            He&apos;s fluent in <span className="text-blue-400">Next.js</span>, <span className="text-blue-400">TypeScript</span>, and <span className="text-blue-400">Tailwind CSS</span>, and has a knack for turning complex backend systems into smooth, reliable engines.
-                            <br/>
-                            Currently, he works as an <span className="text-yellow-300">Application Developer</span> at SMBC Group. Previously, he built a product and materials sourcing platform at JamJars and leveled up data tools at ICBF, transforming clunky legacy systems into real-time dashboards used by thousands of Irish farmers and labs.
-                            By night, he often has his head buried in a good book, recharging his creativity one page at a time.
-                            <br/>
-                            Cristiano is always up for a good challenge, a clean codebase, and a perfectly brewed espresso.
-
-                        </div>
+                        <OpenLine name="bio.txt" />
+                        <Prose>
+                            <p>
+                                Cristiano Gaudino is an <span className="text-term-green">Irish</span> software engineer who builds sleek,
+                                responsive web applications that are just as elegant under the hood as they are on the surface.
+                                He&apos;s fluent in <span className="text-term-blue">Next.js</span>, <span className="text-term-blue">TypeScript</span>,
+                                and <span className="text-term-blue">Tailwind CSS</span>, and has a knack for turning complex backend systems
+                                into smooth, reliable engines.
+                            </p>
+                            <p>
+                                Currently, he works as an <span className="text-term-amber">Application Developer</span> at SMBC Group.
+                                Previously, he built a product and materials sourcing platform at JamJars and leveled up data tools at ICBF,
+                                transforming clunky legacy systems into real-time dashboards used by thousands of Irish farmers and labs.
+                                By night, he often has his head buried in a good book, recharging his creativity one page at a time.
+                            </p>
+                            <p>Cristiano is always up for a good challenge, a clean codebase, and a perfectly brewed espresso.</p>
+                        </Prose>
                     </>
                 )
             },
-            { 
+            {
                 id: 'contact.info',
                 type: 'info',
                 message: (
                     <>
-                        Reach out via email:{" "}
-                        <a 
-                            href="mailto:gaudino.cristian@gmail.com" 
-                            className="underline text-blue-400 hover:text-blue-300"
-                        >
-                            gaudino.cristian@gmail.com
-                        </a>
+                        Reach out via email:{' '}
+                        <ExtLink href="mailto:gaudino.cristian@gmail.com">gaudino.cristian@gmail.com</ExtLink>
                     </>
                 )
             },
@@ -96,24 +138,13 @@ export const COMMANDS: CommandFolder[] = [
                 type: 'pdf',
                 message: (
                     <>
-                        <span className='text-purple-500'>Opening <span className="text-purple-400">resume.pdf</span>...</span>
+                        <OpenLine name="resume.pdf" />
                         <br />
-                        <a
-                            href="/resume.pdf"
+                        <ExtLink href="/resume.pdf">view in browser</ExtLink> or{' '}
+                        <a href="/resume.pdf" download className="text-term-blue underline underline-offset-2 hover:opacity-80">
                             download
-                            className="underline text-blue-400 hover:text-blue-300"
-                        >
-                            Click here to download
                         </a>
-                        {" "}or{" "}
-                        <a
-                            href="/resume.pdf"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="underline text-blue-400 hover:text-blue-300"
-                        >
-                            view in browser
-                        </a>.
+                        .
                     </>
                 )
             },
@@ -127,18 +158,18 @@ export const COMMANDS: CommandFolder[] = [
                 type: 'txt',
                 message: (
                     <>
-                        <span className='text-purple-500'>Opening <span className="text-purple-400">education.txt</span>...</span>
-                        <div className="space-y-3 mt-1">
+                        <OpenLine name="education.txt" />
+                        <div className="mt-1 max-w-[70ch] space-y-3 leading-relaxed">
                             <div>
-                                <span className="text-purple-400">2017 - 2021</span> · <span className="text-green-400">B.Sc. Computer Science</span> @ <span className="text-blue-400">University College Cork</span>
-                                <ul className="list-disc ms-5 text-beige-300">
+                                <Role dates="2017 - 2021" title="B.Sc. Computer Science" org="University College Cork" />
+                                <ul className="ms-5 list-disc text-beige-300">
                                     <li>Graduated with Second Class Honours (2.1).</li>
                                     <li>Final year thesis: AI-Driven Football Betting System (scored 72%).</li>
                                 </ul>
                             </div>
                             <div>
-                                <span className="text-purple-400">2016 - 2017</span> · <span className="text-green-400">Software Development</span> @ <span className="text-blue-400">Kerry College</span>
-                                <ul className="list-disc ms-5 text-beige-300">
+                                <Role dates="2016 - 2017" title="Software Development" org="Kerry College" />
+                                <ul className="ms-5 list-disc text-beige-300">
                                     <li>Awarded Distinction in all 9 modules.</li>
                                 </ul>
                             </div>
@@ -151,41 +182,41 @@ export const COMMANDS: CommandFolder[] = [
                 type: 'txt',
                 message: (
                     <>
-                        <span className='text-purple-500'>Opening <span className="text-purple-400">work_experience.txt</span>...</span>
-                        <div className="space-y-3 mt-1">
+                        <OpenLine name="work_experience.txt" />
+                        <div className="mt-1 max-w-[70ch] space-y-3 leading-relaxed">
                             <div>
-                                <span className="text-purple-400">Feb 2026 - Present</span> · <span className="text-green-400">Application Developer</span> @ <span className="text-blue-400">SMBC Group</span>
-                                <ul className="list-disc ms-5 text-beige-300">
+                                <Role dates="Feb 2026 - Present" title="Application Developer" org="SMBC Group" />
+                                <ul className="ms-5 list-disc text-beige-300">
                                     <li>Building corporate banking applications using React, Vite, and TypeScript.</li>
                                 </ul>
                             </div>
                             <div>
-                                <span className="text-purple-400">Nov 2024 - Nov 2025</span> · <span className="text-green-400">Full Stack Software Engineer</span> @ <span className="text-blue-400">JamJars</span>
-                                <ul className="list-disc ms-5 text-beige-300">
+                                <Role dates="Nov 2024 - Nov 2025" title="Full Stack Software Engineer" org="JamJars" />
+                                <ul className="ms-5 list-disc text-beige-300">
                                     <li>Built a product and materials sourcing platform with Next.js, TypeScript, Tailwind CSS, and PostgreSQL.</li>
                                     <li>Working in an agile team, delivering functional prototypes under tight deadlines.</li>
                                     <li>Collaborated with stakeholders to turn evolving requirements into technical solutions.</li>
                                 </ul>
                             </div>
                             <div>
-                                <span className="text-purple-400">Jul 2023 - Jul 2024</span> · <span className="text-green-400">Graduate Software Engineer</span> @ <span className="text-blue-400">ICBF</span>
-                                <ul className="list-disc ms-5 text-beige-300">
+                                <Role dates="Jul 2023 - Jul 2024" title="Graduate Software Engineer" org="ICBF" />
+                                <ul className="ms-5 list-disc text-beige-300">
                                     <li>Optimised a high-volume Oracle database using PL/SQL.</li>
-                                    <li>Modernised legacy PHP & JS tools, adding features that grew user base by 1,000+.</li>
+                                    <li>Modernised legacy PHP &amp; JS tools, adding features that grew user base by 1,000+.</li>
                                     <li>Built real-time dashboards reducing critical issue resolution from 12 days to 3.</li>
                                 </ul>
                             </div>
                             <div>
-                                <span className="text-purple-400">Nov 2021 - Jul 2023</span> · <span className="text-green-400">Software Developer</span> @ <span className="text-blue-400">Cartwright</span>
-                                <ul className="list-disc ms-5 text-beige-300">
+                                <Role dates="Nov 2021 - Jul 2023" title="Software Developer" org="Cartwright" />
+                                <ul className="ms-5 list-disc text-beige-300">
                                     <li>Developed a responsive car dealership site in React.</li>
                                     <li>Integrated APIs to automate vehicle inventory updates.</li>
                                     <li>Improved search, filtering, and admin tools post-launch.</li>
                                 </ul>
                             </div>
                             <div>
-                                <span className="text-purple-400">2020</span> · <span className="text-green-400">Enterprise Systems Group Intern</span> @ <span className="text-blue-400">JRI America Inc.</span>
-                                <ul className="list-disc ms-5 text-beige-300">
+                                <Role dates="2020" title="Enterprise Systems Group Intern" org="JRI America Inc." />
+                                <ul className="ms-5 list-disc text-beige-300">
                                     <li>Maintained a fleet of Unix/RHEL servers, ensuring stability and compliance.</li>
                                     <li>Developed Ansible/YAML automation scripts to streamline server administration.</li>
                                     <li>Contributed to server migration automation, reducing manual overhead.</li>
@@ -207,23 +238,16 @@ export const COMMANDS: CommandFolder[] = [
                 href: 'https://www.antisocial.cgaudino.com',
                 message: (
                     <>
-                        <span className=''>
-                            anti-social{' '}
-                            <a
-                                href="https://www.antisocial.cgaudino.com"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-green-400"
-                            >
-                                [RUN]
-                            </a>
-                        </span>
-                        <p className="text-beige-300">
-                            Anti-social is an anti-social media platform designed to provide users with a non-addictive, scrollable feed based on expressed interests across different forms of media.
-                        </p>
-                        <p className="text-purple-500">
-                            This platform is still in development; however, a working prototype is available.
-                        </p>
+                        <span>anti-social <RunLink href="https://www.antisocial.cgaudino.com" /></span>
+                        <Prose>
+                            <p>
+                                Anti-social is an anti-social media platform designed to provide users with a non-addictive,
+                                scrollable feed based on expressed interests across different forms of media.
+                            </p>
+                            <p className="text-purple-500">
+                                This platform is still in development; however, a working prototype is available.
+                            </p>
+                        </Prose>
                     </>
                 )
             },
@@ -233,20 +257,13 @@ export const COMMANDS: CommandFolder[] = [
                 href: 'https://www.topdown.cgaudino.com',
                 message: (
                     <>
-                        <span>
-                            topdown.ts{' '}
-                            <a
-                                href="https://www.topdown.cgaudino.com"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-green-400"
-                            >
-                                [RUN]
-                            </a>
-                        </span>
-                        <p className="text-beige-300">
-                            A browser-based top-down game built with HTML5 canvas, featuring dynamic enemy AI and procedurally generated levels.
-                        </p>
+                        <span>topdown.ts <RunLink href="https://www.topdown.cgaudino.com" /></span>
+                        <Prose>
+                            <p>
+                                A browser-based top-down game built with HTML5 canvas, featuring dynamic enemy AI and
+                                procedurally generated levels.
+                            </p>
+                        </Prose>
                     </>
                 )
             },
@@ -256,20 +273,13 @@ export const COMMANDS: CommandFolder[] = [
                 href: 'https://www.trainofthought.cgaudino.com',
                 message: (
                     <>
-                        <span>
-                            Train of Thought{' '}
-                            <a
-                                href="https://www.trainofthought.cgaudino.com"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-green-400"
-                            >
-                                [RUN]
-                            </a>
-                        </span>
-                        <p className="text-beige-300">
-                            Train of Thought is an experimental idea-visualization engine, designed to map and connect concepts in real-time.
-                        </p>
+                        <span>Train of Thought <RunLink href="https://www.trainofthought.cgaudino.com" /></span>
+                        <Prose>
+                            <p>
+                                Train of Thought is an experimental idea-visualization engine, designed to map and connect
+                                concepts in real-time.
+                            </p>
+                        </Prose>
                     </>
                 )
             },
@@ -278,13 +288,13 @@ export const COMMANDS: CommandFolder[] = [
     {
         id: 'skills',
         children: [
-            { 
-                id: 'soft_skills.txt', 
-                type: 'txt', 
+            {
+                id: 'soft_skills.txt',
+                type: 'txt',
                 message: (
                     <>
-                        <span className='text-purple-500'>Opening <span className="text-purple-400">soft_skills.txt</span>...</span>
-                        <ul className="list-disc ms-5 text-green-300">
+                        <OpenLine name="soft_skills.txt" />
+                        <ul className="ms-5 mt-1 list-disc leading-relaxed text-term-green">
                             <li>Clear Communication</li>
                             <li>Problem Solving</li>
                             <li>Team Collaboration</li>
@@ -294,32 +304,26 @@ export const COMMANDS: CommandFolder[] = [
                     </>
                 )
             },
-            { 
-                id: 'tech_skills.txt', 
-                type: 'txt', 
+            {
+                id: 'tech_skills.txt',
+                type: 'txt',
                 message: (
                     <>
-                        <span className='text-purple-500'>Opening <span className="text-purple-400">tech_skills.txt</span>...</span>
-                        <p>
-                            <span className="text-blue-400 w-28 inline-block">Languages:</span>
-                            TypeScript, JavaScript, PHP, PL/SQL, SQL, Python, HTML, CSS
-                        </p>
-                        <p>
-                            <span className="text-blue-400 w-28 inline-block">Frontend:</span>
-                            Next.js, React, Tailwind CSS, Bootstrap 5, JQuery
-                        </p>
-                        <p>
-                            <span className="text-blue-400 w-28 inline-block">Backend:</span>
-                            Node.js, PostgreSQL, Oracle, Laminas PHP
-                        </p>
-                        <p>
-                            <span className="text-blue-400 w-28 inline-block">Tools:</span>
-                            Git, Vercel, Neon
-                        </p>
-                        <p>
-                            <span className="text-blue-400 w-28 inline-block">Other:</span>
-                            Agile Development, AI Development
-                        </p>
+                        <OpenLine name="tech_skills.txt" />
+                        <div className="mt-1 max-w-[68ch] space-y-1 leading-relaxed">
+                            {[
+                                ['Languages', 'TypeScript, JavaScript, PHP, PL/SQL, SQL, Python, HTML, CSS'],
+                                ['Frontend', 'Next.js, React, Tailwind CSS, Bootstrap 5, JQuery'],
+                                ['Backend', 'Node.js, PostgreSQL, Oracle, Laminas PHP'],
+                                ['Tools', 'Git, Vercel, Neon'],
+                                ['Other', 'Agile Development, AI Development'],
+                            ].map(([label, items]) => (
+                                <p key={label}>
+                                    <span className="inline-block w-28 text-term-blue">{label}:</span>
+                                    {items}
+                                </p>
+                            ))}
+                        </div>
                     </>
                 )
             },
@@ -362,41 +366,3 @@ export const SKILLS = [
     "AI Development",
 ];
 
-export const TASKS_BY_STATUS: Record<string, string[]> = {
-    offline: [
-        "hibernate.sys",
-        "dream.img",
-        "shutdown.log",
-        "rem_cycle.mp4",
-    ],
-    // booting: [
-    //     "boot_sequence.sh",
-    //     "loading_env.ts",
-    //     "calibrating_focus.cfg",
-    //     "wake_up_routine.exe",
-    // ],
-    active: [
-        "deploy.sh",
-        "code_review.js",
-        "building_project.tsx",
-        "debug_logs.txt",
-        "writing_docs.md",
-        "task_manager.cpp",
-    ],
-    idle: [
-        "hydration.exe",
-        "scroll_feed.py",
-        "refactor_idea.txt",
-        "ambient_lofi.mp3",
-        "window_gaze.task",
-        "power_saving.bat",
-        "low_power_mode.cfg",
-        "reading.exe",
-    ],
-    // standby: [
-    //     "power_saving.bat",
-    //     "log_off.txt",
-    //     "wind_down.sh",
-    //     "low_power_mode.cfg",
-    // ],
-};

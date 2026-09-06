@@ -1,5 +1,6 @@
 import React from 'react';
 import { COMMANDS, ROOT_DIRS, findFile, findFolder, type FileType } from './definitions';
+import { formatUptime, getCareerUptimeSeconds } from './utils';
 
 export type CommandResult = {
     output?: React.ReactNode;
@@ -200,6 +201,17 @@ const COMMAND_LIST: CommandSpec[] = [
         name: 'whoami',
         summary: 'print current user',
         run: () => ({ output: <Line>cristiano</Line> }),
+    },
+    {
+        name: 'uptime',
+        summary: 'time since the first commit',
+        run: () => ({
+            output: (
+                <Line>
+                    up <span className="text-purple-300">{formatUptime(getCareerUptimeSeconds())}</span>
+                </Line>
+            ),
+        }),
     },
     {
         name: 'date',

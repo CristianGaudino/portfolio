@@ -75,6 +75,8 @@ const TerminalOutput = forwardRef<TerminalOutputHandle>((_, ref) => {
     const [input, setInput] = useState("");
     const [history, setHistory] = useState<string[]>([]);
     const [historyIdx, setHistoryIdx] = useState<number | null>(null);
+    /** once a command has run we grow a spacer so the latest one can pin to the top */
+    const [padded, setPadded] = useState(false);
 
     const containerRef = useRef<HTMLDivElement>(null);
     const spacerRef = useRef<HTMLDivElement>(null);
@@ -110,13 +112,21 @@ const TerminalOutput = forwardRef<TerminalOutputHandle>((_, ref) => {
         return id;
     }, []);
 
+    const clearScreen = useCallback(() => {
+        setEntries([]);
+        setPadded(false);
+    }, []);
+
     const execute = useCallback(
         (command: string, { echo = true }: { echo?: boolean } = {}) => {
             const trimmed = command.trim();
             const here = cwdRef.current;
             if (echo) {
                 const echoId = push({ kind: "echo", prompt: prettyPath(here), command: trimmed });
-                if (trimmed) pinToTopRef.current = echoId;
+                if (trimmed) {
+                    pinToTopRef.current = echoId;
+                    setPadded(true);
+                }
             }
             if (!trimmed) return;
 
@@ -124,7 +134,7 @@ const TerminalOutput = forwardRef<TerminalOutputHandle>((_, ref) => {
 
             const result = runCommand(trimmed, here);
             if (result.clear) {
-                setEntries([]);
+                clearScreen();
                 return;
             }
             if (result.cwd) {
@@ -133,12 +143,12 @@ const TerminalOutput = forwardRef<TerminalOutputHandle>((_, ref) => {
             }
             if (result.output !== undefined) push({ kind: "out", content: result.output });
         },
-        [push],
+        [push, clearScreen],
     );
 
     useImperativeHandle(ref, () => ({
         print: (content: React.ReactNode) => push({ kind: "out", content }),
-        clear: () => setEntries([]),
+        clear: clearScreen,
         run: (command: string) => execute(command),
         focus: () => inputRef.current?.focus(),
     }));
@@ -205,7 +215,7 @@ const TerminalOutput = forwardRef<TerminalOutputHandle>((_, ref) => {
             }
         } else if (e.key === "l" && e.ctrlKey) {
             e.preventDefault();
-            setEntries([]);
+            clearScreen();
         }
     };
 
@@ -216,7 +226,7 @@ const TerminalOutput = forwardRef<TerminalOutputHandle>((_, ref) => {
             bodyClassName="flex flex-col bg-black/95"
             right={
                 <button
-                    onClick={() => setEntries([])}
+                    onClick={clearScreen}
                     className="rounded border border-purple-600 px-2 py-0.5 text-[0.7rem] text-purple-300 transition-colors hover:border-purple-300 hover:text-white"
                 >
                     clear
@@ -250,7 +260,7 @@ const TerminalOutput = forwardRef<TerminalOutputHandle>((_, ref) => {
                     ),
                 )}
                 {/* trailing spacer so the latest command can always scroll to the top */}
-                <div ref={spacerRef} aria-hidden className="h-full shrink-0" />
+                <div ref={spacerRef} aria-hidden className={padded ? "h-full shrink-0" : ""} />
             </div>
 
             <div
