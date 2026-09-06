@@ -21,6 +21,9 @@ import React, {
 import { Window } from "@/components/ui/window";
 import { useKeystrokeSound } from "@/lib/use-keystroke-sound";
 import { FaVolumeHigh, FaVolumeXmark } from "react-icons/fa6";
+import { SITE_CONFIG } from "@/lib/config";
+
+const { user: SHELL_USER, host: SHELL_HOST } = SITE_CONFIG.shell;
 
 const REDUCED =
     typeof window !== "undefined" &&
@@ -66,12 +69,20 @@ type DistributiveOmit<T, K extends keyof T> = T extends unknown ? Omit<T, K> : n
 /** What the scrollback should do after the next render. */
 type ScrollIntent = { type: "pin"; id: number } | { type: "bottom" } | null;
 
+function UserHost() {
+    return (
+        <>
+            <span className="text-term-green">{SHELL_USER}</span>
+            <span className="text-beige-500">@</span>
+            <span className="text-purple-300">{SHELL_HOST}</span>
+        </>
+    );
+}
+
 function Prompt({ cwd, className = "" }: { cwd: string[]; className?: string }) {
     return (
         <span className={`shrink-0 select-none ${className}`}>
-            <span className="text-term-green">cristiano</span>
-            <span className="text-beige-500">@</span>
-            <span className="text-purple-300">cgaudino</span>
+            <UserHost />
             <span className="text-beige-500"> </span>
             <span className="text-term-blue">{prettyPath(cwd)}</span>
             <span className="text-beige-500"> $ </span>
@@ -312,9 +323,7 @@ const TerminalOutput = forwardRef<TerminalOutputHandle, TerminalOutputProps>(({ 
                     entry.kind === "echo" ? (
                         <div key={entry.id} data-entry={entry.id} className="flex flex-wrap items-baseline">
                             <span className="select-none">
-                                <span className="text-term-green">cristiano</span>
-                                <span className="text-beige-500">@</span>
-                                <span className="text-purple-300">cgaudino</span>{" "}
+                                <UserHost />{" "}
                                 <span className="text-term-blue">{entry.prompt}</span>
                                 <span className="text-beige-500"> $</span>
                             </span>

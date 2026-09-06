@@ -66,7 +66,7 @@ export function Dashboard() {
             <div className="flex gap-4">
                 <div className="flex shrink-0 flex-col items-center gap-1.5">
                     <div className="grid h-24 w-24 place-items-center overflow-hidden rounded-md border border-purple-700 bg-purple-800 text-[0.6rem] text-purple-500 glow-soft">
-                        cgaudino
+                        {SITE_CONFIG.shell.host}
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                             src="/ascii_portrait.png"
@@ -80,7 +80,7 @@ export function Dashboard() {
                         />
                     </div>
                     <span className="whitespace-nowrap text-[0.6rem] text-beige-500">
-                        cristiano<span className="text-beige-400">@</span>cgaudino
+                        {SITE_CONFIG.shell.user}<span className="text-beige-400">@</span>{SITE_CONFIG.shell.host}
                     </span>
                 </div>
 

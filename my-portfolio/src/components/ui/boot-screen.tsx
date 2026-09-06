@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getVersion } from '@/lib/utils';
+import { SITE_CONFIG } from '@/lib/config';
 
 type BootLine = {
     text: string;
@@ -24,7 +25,7 @@ const BOOT_LINES: BootLine[] = [
     { text: 'mounting /projects (3 volumes)', tag: 'ok' },
     { text: 'system ready', tag: 'done', hold: 420 },
     { text: '' },
-    { text: 'login: cristiano (auto)', hold: 260 },
+    { text: `login: ${SITE_CONFIG.shell.user} (auto)`, hold: 260 },
 ];
 
 function Tag({ tag }: { tag: BootLine['tag'] }) {

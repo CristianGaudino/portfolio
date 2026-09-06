@@ -1,4 +1,5 @@
 import { ImageResponse } from 'next/og';
+import { SITE_CONFIG } from '@/lib/config';
 
 export const alt = 'Cristiano Gaudino — cgaudino.os';
 export const size = { width: 1200, height: 630 };
@@ -33,7 +34,7 @@ export default function OpengraphImage() {
                 </div>
 
                 <div style={{ marginTop: 'auto', display: 'flex', fontSize: 28 }}>
-                    <span style={{ color: '#6ee7a0' }}>cristiano@cgaudino</span>
+                    <span style={{ color: '#6ee7a0' }}>{SITE_CONFIG.shell.user}@{SITE_CONFIG.shell.host}</span>
                     <span style={{ color: '#7d7bc4' }}>&nbsp;~ $ whoami</span>
                 </div>
             </div>

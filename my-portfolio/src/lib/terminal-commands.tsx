@@ -231,7 +231,7 @@ const COMMAND_LIST: CommandSpec[] = [
     {
         name: 'whoami',
         summary: 'print current user',
-        run: () => ({ output: <Line>cristiano</Line> }),
+        run: () => ({ output: <Line>{SITE_CONFIG.shell.user}</Line> }),
     },
     {
         name: 'uptime',
@@ -264,9 +264,9 @@ const COMMAND_LIST: CommandSpec[] = [
                         <pre className="leading-tight text-purple-400 glow-soft">{NEOFETCH_ART}</pre>
                         <div className="space-y-0.5">
                             <Line>
-                                <span className="text-term-green">cristiano</span>
+                                <span className="text-term-green">{SITE_CONFIG.shell.user}</span>
                                 <span className="text-beige-500">@</span>
-                                <span className="text-purple-300">cgaudino</span>
+                                <span className="text-purple-300">{SITE_CONFIG.shell.host}</span>
                             </Line>
                             <Line><span className="text-beige-600">─────────────────</span></Line>
                             <Kv k="os">cgaudino.os <span className="text-purple-300">{getVersion().version}</span></Kv>

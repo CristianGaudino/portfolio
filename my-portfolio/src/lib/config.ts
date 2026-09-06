@@ -12,6 +12,9 @@ export const SITE_CONFIG = {
         repoUrl: 'https://github.com/CristianGaudino/portfolio',
     },
 
+    /** Shell identity — `user@host` in the prompt, neofetch, boot, etc. */
+    shell: { user: 'root', host: 'cgaudino' },
+
     /** IANA timezone the "host" runs in — drives the clock and derived status. */
     timezone: 'Europe/Dublin',
     timezoneLabel: 'Ireland',
