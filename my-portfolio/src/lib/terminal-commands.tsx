@@ -257,10 +257,7 @@ const COMMAND_LIST: CommandSpec[] = [
                 gh && !gh.degraded && gh.languages.length
                     ? gh.languages.map((l) => l.name).join(' · ')
                     : '—';
-            const music =
-                np?.configured && (np.playing || np.title)
-                    ? `${np.title} — ${np.artist}${np.playing ? '' : ' (last played)'}`
-                    : 'idle';
+            const music = np?.configured && np.playing ? `${np.title} — ${np.artist}` : 'idle';
             return {
                 output: (
                     <div className="flex flex-wrap gap-x-6 gap-y-2">
@@ -332,10 +329,9 @@ const COMMAND_LIST: CommandSpec[] = [
             if (np?.configured) {
                 rows.push(
                     <Kv k="music" key="music">
-                        {np.playing || np.title ? (
+                        {np.playing ? (
                             <>
                                 {np.title} <span className="text-beige-500">— {np.artist}</span>
-                                {!np.playing && <span className="text-beige-500"> (last played)</span>}
                             </>
                         ) : (
                             <span className="text-beige-500">idle</span>

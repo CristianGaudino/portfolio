@@ -322,9 +322,7 @@ function NowSection({ data }: { data: DashboardData }) {
                 ) : !np.data?.configured ? (
                     <span className="text-beige-500">{DASH}</span>
                 ) : !np.data.playing ? (
-                    <span className="text-beige-400">
-                        idle{np.data.title && <span className="text-beige-500"> · last: {np.data.title}</span>}
-                    </span>
+                    <span className="text-beige-500">idle</span>
                 ) : (
                     <span className="inline-flex items-center gap-2">
                         <Equalizer />

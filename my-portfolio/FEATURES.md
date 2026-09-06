@@ -28,7 +28,7 @@ Working log of what's built and what's next. Check things off as they land.
 - [x] Uptime = calendar-accurate time since birth (26 Mar 1999 18:00), ticking every second
 - [x] Ireland clock + derived status (timezone-pinned; previously read the *visitor's* clock)
 - [x] GitHub activity via cached route handler (`/api/github`): commits/14d bars, language meters, last push, focus skill
-- [x] Now-playing row via Spotify (`/api/now-playing`, currently-playing → recently-played fallback) — degrades to "—" until env configured; `scripts/spotify-token.mjs` does the one-time refresh-token handshake
+- [x] Now-playing row via Spotify (`/api/now-playing`) — shows the current track only, "idle" otherwise (no last-played); degrades to "—" until env configured; `scripts/spotify-token.mjs` does the one-time refresh-token handshake
 - [x] reading / watching / playing rows via personal tracker (`/api/tracker`) — degrades until env configured
 - [x] `faves` command + data layer: album/film/series/game of the year from the tracker (`year` field), top artist from Spotify (`/api/spotify-top`, `user-top-read` scope)
 - [x] `MEDIA` section — mirrors `faves` on the panel; renders only when data exists

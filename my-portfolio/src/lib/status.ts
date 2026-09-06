@@ -36,7 +36,6 @@ export type SpotifyTop = {
     configured: boolean;
     artist?: string;
     artistUrl?: string;
-    track?: string;
 };
 
 export type PeerInfo = {
@@ -120,20 +119,9 @@ export async function fetchNowPlaying(): Promise<NowPlaying> {
                 is_playing?: boolean;
                 currently_playing_type?: string;
             };
-            if (json.item && json.currently_playing_type === 'track') {
-                return toNowPlaying(json.item, json.is_playing === true);
+            if (json.item && json.is_playing && json.currently_playing_type === 'track') {
+                return toNowPlaying(json.item, true);
             }
-        }
-
-        // 204 (nothing playing) or a podcast episode → show the last played track
-        const recent = await fetch('https://api.spotify.com/v1/me/player/recently-played?limit=1', {
-            headers: auth,
-            cache: 'no-store',
-        });
-        if (recent.ok) {
-            const json = (await recent.json()) as { items?: { track?: SpotifyTrack }[] };
-            const track = json.items?.[0]?.track;
-            if (track) return toNowPlaying(track, false);
         }
 
         return { configured: true, playing: false };
@@ -175,38 +163,22 @@ export async function fetchSpotifyTop(): Promise<SpotifyTop> {
     try {
         const token = await spotifyAccessToken();
         if (!token) return { configured: true };
-        const auth = { Authorization: `Bearer ${token}` };
 
-        const [artistsRes, tracksRes] = await Promise.all([
-            fetch('https://api.spotify.com/v1/me/top/artists?time_range=long_term&limit=1', {
-                headers: auth,
-                cache: 'no-store',
-            }),
-            fetch('https://api.spotify.com/v1/me/top/tracks?time_range=long_term&limit=1', {
-                headers: auth,
-                cache: 'no-store',
-            }),
-        ]);
+        const res = await fetch('https://api.spotify.com/v1/me/top/artists?time_range=long_term&limit=1', {
+            headers: { Authorization: `Bearer ${token}` },
+            cache: 'no-store',
+        });
+        if (!res.ok) return { configured: true };
 
-        const out: SpotifyTop = { configured: true };
-        if (artistsRes.ok) {
-            const json = (await artistsRes.json()) as {
-                items?: { name: string; external_urls?: { spotify?: string } }[];
-            };
-            const artist = json.items?.[0];
-            if (artist) {
-                out.artist = artist.name;
-                out.artistUrl = artist.external_urls?.spotify;
-            }
-        }
-        if (tracksRes.ok) {
-            const json = (await tracksRes.json()) as {
-                items?: { name: string; artists?: { name: string }[] }[];
-            };
-            const track = json.items?.[0];
-            if (track) out.track = `${track.name} — ${track.artists?.map((a) => a.name).join(', ')}`;
-        }
-        return out;
+        const json = (await res.json()) as {
+            items?: { name: string; external_urls?: { spotify?: string } }[];
+        };
+        const artist = json.items?.[0];
+        return {
+            configured: true,
+            artist: artist?.name,
+            artistUrl: artist?.external_urls?.spotify,
+        };
     } catch {
         return { configured: true };
     }
