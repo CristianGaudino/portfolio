@@ -1,12 +1,20 @@
 /**
- * One-time helper: get a Spotify refresh token for the "now playing" widget.
+ * One-time helper: get a Spotify REFRESH TOKEN so the site can read your
+ * listening data on your behalf.
  *
- *   1. Create an app at https://developer.spotify.com/dashboard
- *      and add redirect URI  http://127.0.0.1:8888/callback
- *   2. Put SPOTIFY_CLIENT_ID / SPOTIFY_CLIENT_SECRET in .env.local
- *      (or pass them as env vars when running this script)
- *   3. node scripts/spotify-token.mjs
- *   4. Approve in the browser; paste the printed refresh token into .env.local
+ * Why this exists: the Client ID + Secret only identify the *app*. To see
+ * *your* now-playing / top artists, you have to approve the app once. That
+ * approval hands back a long-lived "refresh token" the server keeps and uses
+ * to fetch fresh access tokens forever — no login needed again.
+ *
+ *   1. Spotify app: add redirect URI  http://127.0.0.1:8888/callback
+ *   2. Put these in my-portfolio/.env.local :
+ *        SPOTIFY_CLIENT_ID=xxxxxxxx
+ *        SPOTIFY_CLIENT_SECRET=xxxxxxxx
+ *   3. From my-portfolio/ run:  node scripts/spotify-token.mjs
+ *      (or pass them directly:  node scripts/spotify-token.mjs --id XXX --secret YYY)
+ *   4. Approve in the browser, then paste the printed SPOTIFY_REFRESH_TOKEN
+ *      into .env.local and the Vercel project env.
  */
 import { createServer } from 'node:http';
 import { readFileSync } from 'node:fs';
@@ -16,24 +24,58 @@ const PORT = 8888;
 const REDIRECT_URI = `http://127.0.0.1:${PORT}/callback`;
 const SCOPES = 'user-read-currently-playing user-read-recently-played user-top-read';
 
-function loadEnvLocal() {
+/** Parse a .env file: handles `export `, quotes, `#` comments, `=` in values, CRLF, BOM. */
+function parseEnvFile(url) {
+    const out = {};
+    let text;
     try {
-        for (const line of readFileSync(new URL('../.env.local', import.meta.url), 'utf8').split('\n')) {
-            const m = line.match(/^\s*([A-Z_]+)\s*=\s*(.*)\s*$/);
-            if (m && !process.env[m[1]]) process.env[m[1]] = m[2].replace(/^["']|["']$/g, '');
-        }
+        text = readFileSync(url, 'utf8');
     } catch {
-        /* no .env.local — rely on real env vars */
+        return out;
     }
+    for (let line of text.replace(/^﻿/, '').split(/\r?\n/)) {
+        line = line.trim();
+        if (!line || line.startsWith('#')) continue;
+        line = line.replace(/^export\s+/, '');
+        const eq = line.indexOf('=');
+        if (eq === -1) continue;
+        const key = line.slice(0, eq).trim();
+        let val = line.slice(eq + 1).trim();
+        if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+            val = val.slice(1, -1);
+        } else {
+            val = val.replace(/\s+#.*$/, '').trim(); // strip trailing "# comment" on unquoted values
+        }
+        out[key] = val;
+    }
+    return out;
 }
 
-loadEnvLocal();
+const args = process.argv.slice(2);
+const argOf = (name) => {
+    const i = args.indexOf(name);
+    return i !== -1 ? args[i + 1] : undefined;
+};
 
-const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
-const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
+const fileEnv = {
+    ...parseEnvFile(new URL('../.env', import.meta.url)),
+    ...parseEnvFile(new URL('../.env.local', import.meta.url)),
+};
+
+const CLIENT_ID = argOf('--id') || process.env.SPOTIFY_CLIENT_ID || fileEnv.SPOTIFY_CLIENT_ID;
+const CLIENT_SECRET = argOf('--secret') || process.env.SPOTIFY_CLIENT_SECRET || fileEnv.SPOTIFY_CLIENT_SECRET;
+
+const mask = (v) => (v ? `${v.slice(0, 4)}…${v.slice(-2)} (${v.length} chars)` : 'NOT FOUND');
+console.log('\n  SPOTIFY_CLIENT_ID     ' + mask(CLIENT_ID));
+console.log('  SPOTIFY_CLIENT_SECRET ' + mask(CLIENT_SECRET) + '\n');
 
 if (!CLIENT_ID || !CLIENT_SECRET) {
-    console.error('Missing SPOTIFY_CLIENT_ID / SPOTIFY_CLIENT_SECRET (set them in .env.local).');
+    console.error(
+        'Could not find the credentials.\n' +
+            '  · run this from the my-portfolio/ folder\n' +
+            '  · .env.local should have lines like  SPOTIFY_CLIENT_ID=abcd1234  (no quotes needed)\n' +
+            '  · or pass them:  node scripts/spotify-token.mjs --id <ID> --secret <SECRET>\n',
+    );
     process.exit(1);
 }
 
@@ -91,15 +133,20 @@ const server = createServer(async (req, res) => {
 });
 
 server.listen(PORT, '127.0.0.1', () => {
-    console.log('\nOpening Spotify authorization in your browser...');
-    console.log('If it does not open, visit:\n\n  ' + authUrl + '\n');
+    console.log('Trying to open Spotify authorization in your browser...');
+    console.log('If nothing opens, copy this URL into your browser:\n\n  ' + authUrl + '\n');
+
+    // NB: never route the URL through `cmd /c start` — cmd.exe splits it at every `&`.
+    const url = authUrl.toString();
     const opener =
-        process.platform === 'win32' ? ['cmd', ['/c', 'start', '', authUrl.toString()]]
-        : process.platform === 'darwin' ? ['open', [authUrl.toString()]]
-        : ['xdg-open', [authUrl.toString()]];
+        process.platform === 'win32'
+            ? ['rundll32', ['url.dll,FileProtocolHandler', url]]
+            : process.platform === 'darwin'
+              ? ['open', [url]]
+              : ['xdg-open', [url]];
     try {
         spawn(opener[0], opener[1], { stdio: 'ignore', detached: true }).unref();
     } catch {
-        /* user can open the URL manually */
+        /* fine — the URL is printed above */
     }
 });
