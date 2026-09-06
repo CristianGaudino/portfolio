@@ -296,7 +296,7 @@ function MediaSection({ data }: { data: DashboardData }) {
     if (!rows.length) return null;
 
     return (
-        <MonitorSection title="media · past year">
+        <MonitorSection title="personal favourites · past year">
             {rows.map(({ k, node }) => (
                 <StatRow key={k} label={k}>
                     {node}
