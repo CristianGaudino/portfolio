@@ -7,11 +7,12 @@ Working log of what's built and what's next. Check things off as they land.
 ### Boot & atmosphere
 - [x] Typed boot sequence: progress bar, CRT power-on, skip on any key/tap, plays on every load (no persistent skip); static hold under reduced-motion
 - [x] CRT overlay — scanlines, vignette, flicker, accent text-glow (all respect `prefers-reduced-motion`)
-- [x] Shared `Window` chrome (traffic lights + title) on every panel
+- [x] Shared `Window` chrome — traffic lights are live: red/amber collapse to the title bar, green maximises to a full-screen overlay (Esc / click-away to restore). Collapse both top panels and the terminal fills the freed vertical space.
 
 ### Terminal
 - [x] Interactive shell: `help`, `ls`, `cd`, `cat`, `open`, `tree`, `pwd`, `whoami`, `uptime`, `date`, `echo`, `clear`
-- [x] Async commands supported (loading placeholder → in-place update): `neofetch`, `stats`, `now` print live monitor data
+- [x] Async commands supported (loading placeholder → in-place update): `neofetch`, `stats`, `now`, `faves` print live data
+- [x] Scrollback text is selectable (visible `::selection`, focus-on-click skips when a selection is active)
 - [x] Easter eggs: `sudo`, `rm`, `exit`, `hello`
 - [x] History (↑/↓), Tab autocomplete, Ctrl+L
 - [x] File-tree clicks route through the terminal; command pinned to top of scrollback on run (explicit scroll-intent model, survives async updates)
@@ -28,6 +29,7 @@ Working log of what's built and what's next. Check things off as they land.
 - [x] GitHub activity via cached route handler (`/api/github`): commits/14d bars, language meters, last push, focus skill
 - [x] Now-playing row via Spotify (`/api/now-playing`, currently-playing → recently-played fallback) — degrades to "—" until env configured; `scripts/spotify-token.mjs` does the one-time refresh-token handshake
 - [x] reading / watching / playing rows via personal tracker (`/api/tracker`) — degrades until env configured
+- [x] `faves` command + data layer: album/film/series/game of the year from the tracker (`year` field), top artist from Spotify (`/api/spotify-top`, `user-top-read` scope)
 - [x] `config.ts` for non-secret config; `.env.example` for the optional integrations
 
 ### Content & polish
@@ -40,22 +42,22 @@ Working log of what's built and what's next. Check things off as they land.
 ## Backlog
 
 ### Integrations / infra
-- [ ] Populate Vercel env: `GITHUB_TOKEN`, `SPOTIFY_CLIENT_ID`/`SPOTIFY_CLIENT_SECRET`/`SPOTIFY_REFRESH_TOKEN`, `TRACKER_STATUS_URL`
-- [ ] Add a JSON status endpoint to the personal tracker site (`{ reading, watching, playing }`)
+- [ ] Populate Vercel env: `GITHUB_TOKEN`, `SPOTIFY_CLIENT_ID`/`SECRET`/`REFRESH_TOKEN` (re-run `spotify-token.mjs` for the new `user-top-read` scope), `TRACKER_STATUS_URL`
+- [ ] Add a JSON status endpoint to the personal tracker site (`{ reading, watching, playing, year: { album, film, series, game } }`)
 - [ ] Vercel deploy-status row — the site monitoring itself
 - [ ] Peer info from request headers (visitor city + distance from Dublin)
 
 ### System monitor
+- [ ] `MEDIA` section in the monitor mirroring `faves` (renders only when data exists)
 - [ ] Composite "system load" gauge (time-of-day + commit activity + now-playing)
 - [ ] Contribution heatmap (last ~12 weeks) as a grid
 - [ ] "processes" table from recent GitHub repos (name, language, last-touched), repo-id as PID
 
 ### Terminal
-- [ ] `theme` command — green / amber / purple CRT palettes
 - [ ] Optional muted keystroke SFX (off by default)
 
 ### Content & polish
-- [ ] Confirm `SITE_CONFIG.siteUrl` (`https://cgaudino.com`) is the real production URL
+- [ ] Confirm `SITE_CONFIG.siteUrl` (`https://www.cgaudino.com`) is the real production URL
 - [ ] Entrance / stagger animation on first paint after boot
-- [ ] Draggable / resizable windows
-- [ ] `terminal-modal.tsx` is now unused/stale (old placeholder copy) — delete or repurpose
+- [ ] True "close" with a dock to reopen (currently red just collapses like amber)
+- [ ] `terminal-modal.tsx` is unused/stale (old placeholder copy) — delete

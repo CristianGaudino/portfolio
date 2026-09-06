@@ -77,7 +77,11 @@ function Prompt({ cwd, className = "" }: { cwd: string[]; className?: string }) 
     );
 }
 
-const TerminalOutput = forwardRef<TerminalOutputHandle>((_, ref) => {
+type TerminalOutputProps = {
+    onCollapse?: (collapsed: boolean) => void;
+};
+
+const TerminalOutput = forwardRef<TerminalOutputHandle, TerminalOutputProps>(({ onCollapse }, ref) => {
     const [entries, setEntries] = useState<Entry[]>([]);
     const [cwd, setCwd] = useState<string[]>([]);
     const [input, setInput] = useState("");
@@ -198,6 +202,13 @@ const TerminalOutput = forwardRef<TerminalOutputHandle>((_, ref) => {
         }
     }, []);
 
+    /** Focus the input on click — unless the user is selecting text. */
+    const focusInput = useCallback(() => {
+        const sel = window.getSelection();
+        if (sel && !sel.isCollapsed) return;
+        inputRef.current?.focus();
+    }, []);
+
     const autocomplete = () => {
         const parts = input.split(/(\s+)/); // keep separators
         const tokens = input.split(/\s+/);
@@ -267,6 +278,7 @@ const TerminalOutput = forwardRef<TerminalOutputHandle>((_, ref) => {
             title="terminal — zsh"
             className="h-full"
             bodyClassName="flex flex-col bg-black/95"
+            onCollapse={onCollapse}
             right={
                 <button
                     onClick={clearScreen}
@@ -278,8 +290,8 @@ const TerminalOutput = forwardRef<TerminalOutputHandle>((_, ref) => {
         >
             <div
                 ref={containerRef}
-                onClick={() => inputRef.current?.focus()}
-                className="relative min-h-0 flex-1 space-y-1 overflow-y-auto p-4 text-purple-400 text-sm"
+                onClick={focusInput}
+                className="relative min-h-0 flex-1 space-y-1 overflow-y-auto p-4 text-purple-400 text-sm selection:bg-purple-500/40"
             >
                 {entries.map((entry) =>
                     entry.kind === "echo" ? (
@@ -308,7 +320,7 @@ const TerminalOutput = forwardRef<TerminalOutputHandle>((_, ref) => {
 
             <div
                 onClick={() => inputRef.current?.focus()}
-                className="flex shrink-0 flex-wrap items-baseline border-t border-beige-800 bg-black/95 px-4 py-2 text-sm"
+                className="flex shrink-0 flex-wrap items-baseline gap-y-1 border-t border-beige-800 bg-black/95 px-4 py-2 text-sm"
             >
                 <Prompt cwd={cwd} />
                 <input

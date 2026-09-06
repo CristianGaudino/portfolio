@@ -49,6 +49,11 @@
     :root {
         color-scheme: dark;
     }
+
+    ::selection {
+        background: color-mix(in srgb, var(--color-purple-400) 45%, transparent);
+        color: var(--color-beige-100);
+    }
 }
 
 @layer utilities {

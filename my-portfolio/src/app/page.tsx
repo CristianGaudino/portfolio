@@ -20,6 +20,10 @@ export default function Home() {
     const [expandedCommand, setExpandedCommand] = useState<string | null>(null);
     const [xsView, setXsView] = useState<'files' | 'dashboard'>('files');
     const [focusedId, setFocusedId] = useState<string | null>(null);
+    const [filesCollapsed, setFilesCollapsed] = useState(false);
+    const [monitorCollapsed, setMonitorCollapsed] = useState(false);
+    const [termCollapsed, setTermCollapsed] = useState(false);
+    const topAllCollapsed = filesCollapsed && monitorCollapsed;
 
     const handleBooted = useCallback(() => setBooted(true), []);
 
@@ -116,12 +120,17 @@ export default function Home() {
                     ))}
                 </div>
 
-                <main className="flex-1 min-h-0 flex gap-4 px-4 pt-4 pb-2 overflow-hidden">
+                <main
+                    className={`flex gap-4 px-4 pt-4 pb-2 ${
+                        topAllCollapsed ? 'shrink-0' : 'flex-1 min-h-0 overflow-hidden'
+                    }`}
+                >
                     {/* File tree */}
                     <Window
                         title="~/cristiano_gaudino"
                         className={`w-full lg:w-1/2 ${xsView === 'files' ? 'flex' : 'hidden'} lg:flex`}
                         bodyClassName="overflow-y-auto p-4"
+                        onCollapse={setFilesCollapsed}
                     >
                         <div className="space-y-1.5">
                             {COMMANDS.map(cmd => {
@@ -172,13 +181,22 @@ export default function Home() {
                         title="system-monitor"
                         className={`w-full lg:w-1/2 ${xsView === 'dashboard' ? 'flex' : 'hidden'} lg:flex`}
                         bodyClassName="flex overflow-hidden"
+                        onCollapse={setMonitorCollapsed}
                     >
                         <Dashboard />
                     </Window>
                 </main>
 
-                <div className="shrink-0 h-[46dvh] px-4 pb-2 lg:h-72">
-                    <TerminalOutput ref={termRef} />
+                <div
+                    className={`px-4 pb-2 ${
+                        termCollapsed
+                            ? 'shrink-0 h-auto'
+                            : topAllCollapsed
+                              ? 'flex-1 min-h-0'
+                              : 'shrink-0 h-[46dvh] lg:h-72'
+                    }`}
+                >
+                    <TerminalOutput ref={termRef} onCollapse={setTermCollapsed} />
                 </div>
 
                 <footer className="shrink-0 flex w-full flex-row items-center justify-between border-t border-beige-700 bg-beige-900 px-8 py-3 text-beige-400">

@@ -14,7 +14,7 @@ import { spawn } from 'node:child_process';
 
 const PORT = 8888;
 const REDIRECT_URI = `http://127.0.0.1:${PORT}/callback`;
-const SCOPES = 'user-read-currently-playing user-read-recently-played';
+const SCOPES = 'user-read-currently-playing user-read-recently-played user-top-read';
 
 function loadEnvLocal() {
     try {

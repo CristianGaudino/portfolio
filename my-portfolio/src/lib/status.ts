@@ -16,11 +16,27 @@ export type TrackedItem = {
     progress?: number;
 };
 
+/** Favourites of the past year, from the tracker site. */
+export type YearFaves = {
+    album?: TrackedItem;
+    film?: TrackedItem;
+    series?: TrackedItem;
+    game?: TrackedItem;
+};
+
 export type TrackerStatus = {
     configured: boolean;
     reading?: TrackedItem;
     watching?: TrackedItem;
     playing?: TrackedItem;
+    year?: YearFaves;
+};
+
+export type SpotifyTop = {
+    configured: boolean;
+    artist?: string;
+    artistUrl?: string;
+    track?: string;
 };
 
 type SpotifyTrack = {
@@ -131,8 +147,53 @@ export async function fetchTrackerStatus(): Promise<TrackerStatus> {
             reading: json.reading,
             watching: json.watching,
             playing: json.playing,
+            year: json.year,
         };
     } catch {
         return { configured: false };
+    }
+}
+
+/** Most-played artist on Spotify (long term). Needs the `user-top-read` scope. */
+export async function fetchSpotifyTop(): Promise<SpotifyTop> {
+    if (!spotifyConfigured()) return { configured: false };
+
+    try {
+        const token = await spotifyAccessToken();
+        if (!token) return { configured: true };
+        const auth = { Authorization: `Bearer ${token}` };
+
+        const [artistsRes, tracksRes] = await Promise.all([
+            fetch('https://api.spotify.com/v1/me/top/artists?time_range=long_term&limit=1', {
+                headers: auth,
+                cache: 'no-store',
+            }),
+            fetch('https://api.spotify.com/v1/me/top/tracks?time_range=long_term&limit=1', {
+                headers: auth,
+                cache: 'no-store',
+            }),
+        ]);
+
+        const out: SpotifyTop = { configured: true };
+        if (artistsRes.ok) {
+            const json = (await artistsRes.json()) as {
+                items?: { name: string; external_urls?: { spotify?: string } }[];
+            };
+            const artist = json.items?.[0];
+            if (artist) {
+                out.artist = artist.name;
+                out.artistUrl = artist.external_urls?.spotify;
+            }
+        }
+        if (tracksRes.ok) {
+            const json = (await tracksRes.json()) as {
+                items?: { name: string; artists?: { name: string }[] }[];
+            };
+            const track = json.items?.[0];
+            if (track) out.track = `${track.name} — ${track.artists?.map((a) => a.name).join(', ')}`;
+        }
+        return out;
+    } catch {
+        return { configured: true };
     }
 }

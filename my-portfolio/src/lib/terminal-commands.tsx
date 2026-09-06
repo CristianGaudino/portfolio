@@ -10,7 +10,7 @@ import {
     getVersion,
 } from './utils';
 import type { GithubActivity } from './github';
-import type { NowPlaying, TrackerStatus } from './status';
+import type { NowPlaying, SpotifyTop, TrackerStatus } from './status';
 import { Bars, MeterList } from '@/components/ui/monitor';
 
 export type CommandResult = {
@@ -370,6 +370,57 @@ const COMMAND_LIST: CommandSpec[] = [
                 return { output: <Line><span className="text-beige-500">nothing on right now — check back later</span></Line> };
             }
             return { output: <div className="space-y-0.5">{rows}</div> };
+        },
+    },
+    {
+        name: 'faves',
+        summary: "cristiano's year in media",
+        run: async () => {
+            const [tr, top] = await Promise.all([
+                getJson<TrackerStatus>('/api/tracker'),
+                getJson<SpotifyTop>('/api/spotify-top'),
+            ]);
+            const year = tr?.year;
+            const rows: React.ReactNode[] = [];
+
+            ([['album', year?.album], ['film', year?.film], ['series', year?.series], ['game', year?.game]] as const).forEach(
+                ([k, item]) => {
+                    if (!item) return;
+                    rows.push(
+                        <Kv k={k} key={k}>
+                            {item.title}
+                            {item.detail && <span className="text-beige-500"> — {item.detail}</span>}
+                        </Kv>,
+                    );
+                },
+            );
+
+            if (top?.artist) {
+                rows.push(
+                    <Kv k="artist" key="artist">
+                        {top.artistUrl ? (
+                            <a href={top.artistUrl} target="_blank" rel="noopener noreferrer" className="text-term-blue underline">
+                                {top.artist}
+                            </a>
+                        ) : (
+                            top.artist
+                        )}
+                        <span className="text-beige-500"> · most played</span>
+                    </Kv>,
+                );
+            }
+
+            if (!rows.length) {
+                return { output: <Line><span className="text-beige-500">no favourites logged yet — check back later</span></Line> };
+            }
+            return {
+                output: (
+                    <div className="space-y-0.5">
+                        <Line><span className="text-purple-300">cristiano&apos;s last 12 months</span></Line>
+                        {rows}
+                    </div>
+                ),
+            };
         },
     },
     {
