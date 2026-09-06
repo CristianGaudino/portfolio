@@ -49,12 +49,9 @@ export function Dashboard() {
 
     const professionalYears = getProfessionalYears();
     const academicYears = 4;
-    const totalYears = academicYears + professionalYears;
 
     return (
-        <div className="p-4 bg-beige-800 text-beige-300 flex flex-col items-center space-y-3 h-full w-full overflow-y-auto rounded-md border border-beige-600 max-w-108">
-            <div className="text-lg font-semibold text-purple-300">System Dashboard</div>
-
+        <div className="p-4 text-beige-300 flex flex-col items-center space-y-3 h-full w-full overflow-y-auto">
             {/* Avatar */}
             <div className="w-24 h-24 bg-purple-700 rounded-sm flex items-center justify-center text-sm text-beige-500">
                 IMG
@@ -89,7 +86,6 @@ export function Dashboard() {
                         </span>
                     </div>
                 </div>
-                <div className="text-xs text-beige-400">({totalYears} years total)</div>
             </div>
 
             {/* Last Commit */}

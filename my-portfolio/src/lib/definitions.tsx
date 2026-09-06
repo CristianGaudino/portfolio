@@ -25,9 +25,24 @@ export interface FileNode {
 
 export type FileType = 'exe' | 'txt' | 'info' | 'pdf';
 
+export interface CommandFile {
+    id: string;
+    type: FileType;
+    message: React.ReactNode;
+    href?: string;
+}
+
+export interface CommandFolder {
+    id: string;
+    children: CommandFile[];
+}
+
 export type TerminalOutputHandle = {
     print: (content: React.ReactNode) => void;
     clear: () => void;
+    /** Execute a command string as though the user had typed it. */
+    run: (command: string) => void;
+    focus: () => void;
 };
 
 export type TerminalLine = {
@@ -38,7 +53,7 @@ export type TerminalLine = {
 
 // Const
 
-export const COMMANDS = [
+export const COMMANDS: CommandFolder[] = [
     {
         id: 'about',
         children: [
@@ -186,9 +201,10 @@ export const COMMANDS = [
     {
         id: 'projects',
         children: [
-            { 
-                id: 'antisocial.exe', 
-                type: 'exe', 
+            {
+                id: 'antisocial.exe',
+                type: 'exe',
+                href: 'https://www.antisocial.cgaudino.com',
                 message: (
                     <>
                         <span className=''>
@@ -214,6 +230,7 @@ export const COMMANDS = [
             {
                 id: 'topdown.ts',
                 type: 'exe',
+                href: 'https://www.topdown.cgaudino.com',
                 message: (
                     <>
                         <span>
@@ -236,6 +253,7 @@ export const COMMANDS = [
             {
                 id: 'train_of_thought.exe',
                 type: 'exe',
+                href: 'https://www.trainofthought.cgaudino.com',
                 message: (
                     <>
                         <span>
@@ -308,6 +326,16 @@ export const COMMANDS = [
         ]
     }
 ];
+
+export const ROOT_DIRS = COMMANDS.map((c) => c.id);
+
+export function findFolder(name: string): CommandFolder | null {
+    return COMMANDS.find((c) => c.id === name) ?? null;
+}
+
+export function findFile(folder: string, file: string): CommandFile | null {
+    return findFolder(folder)?.children.find((ch) => ch.id === file) ?? null;
+}
 
 export const SKILLS = [
     "Next.js",

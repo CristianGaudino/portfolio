@@ -7,6 +7,8 @@ import TerminalOutput from '@/components/ui/terminal-output';
 import { COMMANDS, TerminalOutputHandle } from '@/lib/definitions';
 import { shareTechMono } from '@/components/ui/fonts';
 import { BsFileEarmarkCode, BsFileEarmarkPdf, BsFileEarmarkPerson, BsFileEarmarkText } from 'react-icons/bs';
+import { Window } from '@/components/ui/window';
+import { BootScreen } from '@/components/ui/boot-screen';
 
 type VisibleItem =
     | { id: string; type: 'folder' }
@@ -14,25 +16,32 @@ type VisibleItem =
 
 export default function Home() {
     const termRef = useRef<TerminalOutputHandle>(null);
+    const [booted, setBooted] = useState(false);
     const [expandedCommand, setExpandedCommand] = useState<string | null>(null);
     const [xsView, setXsView] = useState<'files' | 'dashboard'>('files');
     const [focusedId, setFocusedId] = useState<string | null>(null);
 
     useEffect(() => {
-        if (termRef.current) {
-            termRef.current.print(
-                <>
-                    <span className="text-purple-500">[boot sequence initialized...]</span>
-                    <div className="text-purple-500">cgaudino.os <span className='text-green-400'>online</span></div>
-                    <div className="text-purple-400">Welcome, click a folder to explore the filesystem.</div>
-                    <div className="text-yellow-600 text-xs">Note: some information on this site may be outdated.</div>
-                </>
-            );
-        }
-    }, []);
+        if (!booted) return;
+        termRef.current?.print(
+            <>
+                <span className="text-purple-300 glow-soft">cgaudino.os</span>{' '}
+                <span className="text-term-green">online</span>
+                <div className="text-beige-400">
+                    type <span className="text-purple-300">help</span> to list commands, or click a folder to browse.
+                </div>
+            </>,
+        );
+        termRef.current?.focus();
+    }, [booted]);
 
     const toggleCommand = (id: string) => {
         setExpandedCommand(prev => (prev === id ? null : id));
+    };
+
+    const runChild = (folderId: string, childId: string, type: string) => {
+        const verb = type === 'exe' ? 'open' : 'cat';
+        termRef.current?.run(`${verb} ${folderId}/${childId}`);
     };
 
     const visibleItems = useMemo<VisibleItem[]>(() => {
@@ -69,7 +78,7 @@ export default function Home() {
                 } else {
                     const folder = COMMANDS.find(c => c.id === item.folderId);
                     const child = folder?.children?.find(c => c.id === focusedId);
-                    if (child?.message) termRef.current?.print(child.message);
+                    if (child) runChild(item.folderId, child.id, child.type);
                 }
             } else if (e.key === 'Escape') {
                 setFocusedId(null);
@@ -81,101 +90,110 @@ export default function Home() {
     }, [focusedId, visibleItems]);
 
     return (
-        <div className={`h-screen flex flex-col overflow-hidden bg-beige-800 text-beige-300 ${shareTechMono.variable} font-primary`}>
+        <div className={`relative h-screen flex flex-col overflow-hidden bg-beige-900 text-beige-300 ${shareTechMono.variable} font-primary`}>
+            <div className="crt-overlay" aria-hidden />
+            <div className="crt-vignette" aria-hidden />
 
-            {/* Mobile toggle */}
-            <div className="sm:hidden shrink-0 bg-beige-800 py-3 px-4 flex justify-center gap-4 border-b border-beige-700">
-                <button
-                    onClick={() => setXsView('files')}
-                    className={`px-4 py-2 rounded ${xsView === 'files' ? 'bg-purple-600 text-beige-200' : 'bg-purple-900 text-purple-300'}`}
-                >
-                    Files
-                </button>
-                <button
-                    onClick={() => setXsView('dashboard')}
-                    className={`px-4 py-2 rounded ${xsView === 'dashboard' ? 'bg-purple-600 text-beige-200' : 'bg-purple-900 text-purple-300'}`}
-                >
-                    Dashboard
-                </button>
-            </div>
+            {!booted && <BootScreen onDone={() => setBooted(true)} />}
 
-            <main className="flex-1 overflow-y-auto min-h-0 flex px-4 py-6 gap-4">
-                {/* File structure */}
-                <div className={`w-full sm:w-1/2 ${xsView === 'files' ? 'block' : 'hidden'} sm:block`}>
-                    <h1 className='text-xl mb-2'>/cristiano_gaudino</h1>
-                    <div className='space-y-2 ml-2'>
-                        {COMMANDS.map(cmd => (
-                            <div key={cmd.id}>
-                                <button
-                                    onClick={() => { toggleCommand(cmd.id); setFocusedId(cmd.id); }}
-                                    className={`block w-full text-left transition-colors ${
-                                        focusedId === cmd.id
-                                            ? 'text-purple-300 border-l border-purple-500 pl-1.5 -ml-2'
-                                            : 'hover:text-beige-100'
-                                    }`}
-                                >
-                                    &gt;&gt; {cmd.id}
-                                </button>
+            <div className={`flex h-full flex-col ${booted ? 'crt-power-on' : 'invisible'}`}>
+                {/* Mobile toggle */}
+                <div className="sm:hidden shrink-0 flex justify-center gap-2 border-b border-beige-700 bg-beige-900 px-4 py-2 text-sm">
+                    {(['files', 'dashboard'] as const).map(view => (
+                        <button
+                            key={view}
+                            onClick={() => setXsView(view)}
+                            className={`px-3 py-1 uppercase tracking-[0.15em] transition-colors ${
+                                xsView === view
+                                    ? 'text-purple-300 border-b border-purple-400'
+                                    : 'text-beige-500 hover:text-beige-300'
+                            }`}
+                        >
+                            [{view}]
+                        </button>
+                    ))}
+                </div>
 
-                                {expandedCommand === cmd.id && cmd.children && (
-                                    <div className="ml-4 space-y-1 pt-1">
-                                        {cmd.children.map(child => (
-                                            <button
-                                                key={child.id}
-                                                onClick={() => {
-                                                    setFocusedId(child.id);
-                                                    if (child.message) {
-                                                        termRef.current?.print(child.message);
-                                                    } else {
-                                                        termRef.current?.print(
-                                                            <span>opening {child.id}...</span>
-                                                        );
-                                                    }
-                                                }}
-                                                className={`text-sm block text-left transition-colors ${
-                                                    focusedId === child.id
-                                                        ? 'text-purple-300 border-l border-purple-500 pl-1.5 -ml-2'
-                                                        : 'text-beige-400 hover:text-beige-100'
-                                                }`}
-                                            >
-                                                <span className="flex items-center gap-1">
-                                                    {child.type === 'txt' && <BsFileEarmarkText className="text-blue-400" />}
-                                                    {child.type === 'info' && <BsFileEarmarkPerson className="text-yellow-400" />}
-                                                    {child.type === 'exe' && <BsFileEarmarkCode className="text-green-400" />}
-                                                    {child.type === 'pdf' && <BsFileEarmarkPdf className="text-red-400" />}
-                                                    {child.id}
-                                                </span>
-                                            </button>
-                                        ))}
+                <main className="flex-1 min-h-0 flex gap-4 px-4 pt-4 pb-2 overflow-hidden">
+                    {/* File tree */}
+                    <Window
+                        title="~/cristiano_gaudino"
+                        className={`w-full sm:w-1/2 ${xsView === 'files' ? 'flex' : 'hidden'} sm:flex`}
+                        bodyClassName="overflow-y-auto p-4"
+                    >
+                        <div className="space-y-1.5">
+                            {COMMANDS.map(cmd => {
+                                const open = expandedCommand === cmd.id;
+                                return (
+                                    <div key={cmd.id}>
+                                        <button
+                                            onClick={() => { toggleCommand(cmd.id); setFocusedId(cmd.id); }}
+                                            className={`flex w-full items-center gap-1.5 rounded px-1.5 py-0.5 text-left transition-colors ${
+                                                focusedId === cmd.id
+                                                    ? 'bg-purple-700/40 text-purple-200'
+                                                    : 'hover:bg-beige-700/40 hover:text-beige-100'
+                                            }`}
+                                        >
+                                            <span className={`text-purple-400 transition-transform ${open ? 'rotate-90' : ''}`}>▸</span>
+                                            <span>{cmd.id}/</span>
+                                        </button>
+
+                                        {open && cmd.children && (
+                                            <div className="ml-3 mt-1 space-y-0.5 border-l border-beige-700 pl-3">
+                                                {cmd.children.map(child => (
+                                                    <button
+                                                        key={child.id}
+                                                        onClick={() => { setFocusedId(child.id); runChild(cmd.id, child.id, child.type); }}
+                                                        className={`flex w-full items-center gap-1.5 rounded px-1.5 py-0.5 text-left text-sm transition-colors ${
+                                                            focusedId === child.id
+                                                                ? 'bg-purple-700/40 text-purple-200'
+                                                                : 'text-beige-400 hover:bg-beige-700/40 hover:text-beige-100'
+                                                        }`}
+                                                    >
+                                                        {child.type === 'txt' && <BsFileEarmarkText className="shrink-0 text-term-blue" />}
+                                                        {child.type === 'info' && <BsFileEarmarkPerson className="shrink-0 text-term-amber" />}
+                                                        {child.type === 'exe' && <BsFileEarmarkCode className="shrink-0 text-term-green" />}
+                                                        {child.type === 'pdf' && <BsFileEarmarkPdf className="shrink-0 text-term-red" />}
+                                                        {child.id}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
-                                )}
-                            </div>
-                        ))}
+                                );
+                            })}
+                        </div>
+                    </Window>
+
+                    {/* Dashboard */}
+                    <Window
+                        title="system-monitor"
+                        className={`w-full sm:w-1/2 ${xsView === 'dashboard' ? 'flex' : 'hidden'} sm:flex`}
+                        bodyClassName="flex overflow-hidden"
+                    >
+                        <Dashboard />
+                    </Window>
+                </main>
+
+                <div className="shrink-0 h-56 px-4 pb-2 sm:h-72">
+                    <TerminalOutput ref={termRef} />
+                </div>
+
+                <footer className="shrink-0 flex w-full flex-row items-center justify-between border-t border-beige-700 bg-beige-900 px-8 py-3 text-beige-400">
+                    <span className="text-purple-300 glow-soft">cgaudino.os</span>
+                    <div className="flex items-center gap-4">
+                        <a href="https://github.com/CristianGaudino" className="flex items-center underline transition-colors hover:text-beige-100" target="_blank" rel="noopener noreferrer">
+                            <FaGithub className="mr-2 text-white" />
+                            GitHub
+                        </a>
+                        <span className="text-beige-600">|</span>
+                        <a href="https://www.linkedin.com/in/cristiano-gaudino" className="flex items-center underline transition-colors hover:text-beige-100" target="_blank" rel="noopener noreferrer">
+                            <FaLinkedin className="mr-2 text-term-blue" />
+                            LinkedIn
+                        </a>
                     </div>
-                </div>
-
-                {/* Dashboard */}
-                <div className={`w-full sm:w-1/2 flex justify-center sm:justify-end self-start me-2 ${xsView === 'dashboard' ? 'block' : 'hidden'} sm:flex`}>
-                    <Dashboard />
-                </div>
-            </main>
-
-            <TerminalOutput ref={termRef} />
-
-            <footer className="shrink-0 w-full py-3 bg-beige-900 text-beige-400 flex flex-row items-center justify-between px-8 border-t border-beige-700 font-primary">
-                <span>cgaudino.os</span>
-                <div className="flex items-center gap-4">
-                    <a href="https://github.com/CristianGaudino" className="underline flex items-center" target="_blank" rel="noopener noreferrer">
-                        <FaGithub className="text-white mr-2" />
-                        GitHub
-                    </a>
-                    <span>|</span>
-                    <a href="https://www.linkedin.com/in/cristiano-gaudino" className="underline flex items-center" target="_blank" rel="noopener noreferrer">
-                        <FaLinkedin className="text-blue-400 mr-2" />
-                        LinkedIn
-                    </a>
-                </div>
-            </footer>
+                </footer>
+            </div>
         </div>
     );
 }
