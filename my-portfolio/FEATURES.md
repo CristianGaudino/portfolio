@@ -37,7 +37,8 @@ Working log of what's built and what's next. Check things off as they land.
 - [x] File contents: shared `OpenLine` / `Prose` / `ExtLink` / `RunLink` / `Role` helpers, `max-w`/`leading-relaxed`, real paragraphs
 - [x] All ad-hoc `text-blue-400` / `text-green-400` / `text-yellow-300` in `definitions.tsx` → `--color-term-*` tokens
 - [x] Fixed `bio.txt` printing the wrong filename
-- [x] `metadata` — description, OpenGraph/Twitter tags, `metadataBase`; dynamic OG image at `src/app/opengraph-image.tsx`
+- [x] `metadata` — description, OpenGraph/Twitter tags, `metadataBase` (`www.cgaudino.com`); dynamic OG image at `src/app/opengraph-image.tsx`
+- [x] Deleted dead `terminal-modal.tsx` + unused types (`FileNode`, `TerminalLine`, `TerminalModalProps`, `TerminalOutputProps`)
 
 ## Backlog
 
@@ -57,7 +58,6 @@ Working log of what's built and what's next. Check things off as they land.
 - [ ] Optional muted keystroke SFX (off by default)
 
 ### Content & polish
-- [ ] Confirm `SITE_CONFIG.siteUrl` (`https://www.cgaudino.com`) is the real production URL
 - [ ] Entrance / stagger animation on first paint after boot
 - [ ] True "close" with a dock to reopen (currently red just collapses like amber)
-- [ ] `terminal-modal.tsx` is unused/stale (old placeholder copy) — delete
+- [ ] `framer-motion` is now an unused dependency — drop it from `package.json` when doing a lockfile pass

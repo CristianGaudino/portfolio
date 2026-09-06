@@ -1,26 +1,5 @@
 import React from 'react';
 
-// Props
-export interface TerminalModalProps {
-    command: string;
-    onClose: () => void;
-}
-
-export interface TerminalOutputProps {
-    text: string;
-}
-
-// Interfaces
-
-export interface FileNode {
-    id: string;
-    name: string;
-    type: FileType;
-    url?: string; // for exe links
-    content?: string; // for txt/info files
-    children?: FileNode[]; // for folders
-}
-
 // Types
 
 export type FileType = 'exe' | 'txt' | 'info' | 'pdf';
@@ -43,12 +22,6 @@ export type TerminalOutputHandle = {
     /** Execute a command string as though the user had typed it. */
     run: (command: string) => void;
     focus: () => void;
-};
-
-export type TerminalLine = {
-    id: number;
-    time: string;
-    content: React.ReactNode;
 };
 
 // Shared presentational helpers for file contents — keep colour + rhythm in one place.
