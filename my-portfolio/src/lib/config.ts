@@ -14,12 +14,12 @@ export const SITE_CONFIG = {
 
     /** IANA timezone the "host" runs in — drives the clock and derived status. */
     timezone: 'Europe/Dublin',
-    timezoneCity: 'Dublin',
+    timezoneLabel: 'Ireland',
     /** Host coordinates — used to show a visitor's distance from the "host". */
     hostGeo: { lat: 53.3498, lon: -6.2603 },
 
-    /** Anchor dates (ISO, UTC midnight assumed). */
-    birthDate: '1999-03-26',
+    /** Anchor dates. `birthDate` is a full ISO instant (26 Mar 1999, 18:00, GMT). */
+    birthDate: '1999-03-26T18:00:00Z',
     careerStart: '2021-01-01',
 
     /** Years of formal CS education, shown in the experience readout. */

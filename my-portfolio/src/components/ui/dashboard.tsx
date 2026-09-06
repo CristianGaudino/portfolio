@@ -6,8 +6,7 @@ import { SKILLS } from "@/lib/definitions";
 import { SITE_CONFIG } from "@/lib/config";
 import {
     formatRelative,
-    formatUptime,
-    getCareerUptimeSeconds,
+    getUptimeReadout,
     getDevStatus,
     getLocalTime,
     getProfessionalYears,
@@ -110,7 +109,7 @@ export function Dashboard() {
 
 function SystemSection({ data }: { data: DashboardData }) {
     const { gh, np, peer, deploy } = data;
-    const [uptime, setUptime] = useState<number | null>(null);
+    const [uptime, setUptime] = useState<string | null>(null);
     const [clock, setClock] = useState<string | null>(null);
     const [status, setStatus] = useState<{ status: DevStatus; color: string } | null>(null);
     const { version } = getVersion();
@@ -118,7 +117,7 @@ function SystemSection({ data }: { data: DashboardData }) {
 
     useEffect(() => {
         const tick = () => {
-            setUptime(getCareerUptimeSeconds());
+            setUptime(getUptimeReadout());
             setClock(getLocalTime());
             setStatus(getDevStatus());
         };
@@ -135,7 +134,7 @@ function SystemSection({ data }: { data: DashboardData }) {
         <MonitorSection title="system">
             <StatRow label="os">
                 cgaudino.os{" "}
-                <span className="text-purple-300" title={`v = years.months since ${SITE_CONFIG.birthDate}`}>
+                <span className="text-purple-300" title={`v = years.months since ${SITE_CONFIG.birthDate.slice(0, 10)}`}>
                     {version}
                 </span>
             </StatRow>
@@ -159,13 +158,13 @@ function SystemSection({ data }: { data: DashboardData }) {
                 </StatRow>
             )}
             <StatRow label="uptime">
-                {uptime === null ? <Skeleton className="h-3 w-40" /> : formatUptime(uptime)}
+                {uptime === null ? <Skeleton className="h-3 w-40" /> : <span className="tabular-nums">{uptime}</span>}
             </StatRow>
             <StatRow label="load">
                 {load === null ? <Skeleton className="h-3 w-32" /> : <Gauge value={load} />}
             </StatRow>
             <StatRow label="location">
-                {SITE_CONFIG.timezoneCity}
+                {SITE_CONFIG.timezoneLabel}
                 {clock && <span className="text-beige-400"> · {clock}</span>}
             </StatRow>
             {p?.available && (p.city || p.km != null) && (

@@ -1,14 +1,7 @@
 import React from 'react';
 import { COMMANDS, ROOT_DIRS, findFile, findFolder, type FileType } from './definitions';
 import { SITE_CONFIG } from './config';
-import {
-    formatRelative,
-    formatUptime,
-    getCareerUptimeSeconds,
-    getDevStatus,
-    getLocalTime,
-    getVersion,
-} from './utils';
+import { formatRelative, getUptimeReadout, getDevStatus, getLocalTime, getVersion } from './utils';
 import type { GithubActivity } from './github';
 import type { NowPlaying, SpotifyTop, TrackerStatus } from './status';
 import { Bars, MeterList } from '@/components/ui/monitor';
@@ -246,7 +239,7 @@ const COMMAND_LIST: CommandSpec[] = [
         run: () => ({
             output: (
                 <Line>
-                    up <span className="text-purple-300">{formatUptime(getCareerUptimeSeconds())}</span>
+                    up <span className="text-purple-300">{getUptimeReadout()}</span>
                 </Line>
             ),
         }),
@@ -280,8 +273,8 @@ const COMMAND_LIST: CommandSpec[] = [
                             </Line>
                             <Line><span className="text-beige-600">─────────────────</span></Line>
                             <Kv k="os">cgaudino.os <span className="text-purple-300">{getVersion().version}</span></Kv>
-                            <Kv k="host">{SITE_CONFIG.timezoneCity} · {getLocalTime()}</Kv>
-                            <Kv k="uptime">{formatUptime(getCareerUptimeSeconds())}</Kv>
+                            <Kv k="host">{SITE_CONFIG.timezoneLabel} · {getLocalTime()}</Kv>
+                            <Kv k="uptime">{getUptimeReadout()}</Kv>
                             <Kv k="shell">zsh</Kv>
                             <Kv k="langs">{langs}</Kv>
                             <Kv k="music">{music}</Kv>

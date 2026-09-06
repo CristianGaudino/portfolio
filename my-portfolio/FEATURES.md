@@ -25,8 +25,8 @@ Working log of what's built and what's next. Check things off as they land.
 - [x] Reusable primitives (`components/ui/monitor.tsx`): `MonitorSection`, `StatRow`, `Meter`, `MeterList`, `Bars`, `Sparkline`, `Skeleton`, `Equalizer`
 - [x] ASCII portrait wired in (`public/ascii_portrait.png`)
 - [x] Real build info — `branch@sha` + build age, injected at build time via `next.config.ts`
-- [x] Career uptime, ticking every second
-- [x] Dublin-pinned clock + derived status (previously read the *visitor's* clock)
+- [x] Uptime = calendar-accurate time since birth (26 Mar 1999 18:00), ticking every second
+- [x] Ireland clock + derived status (timezone-pinned; previously read the *visitor's* clock)
 - [x] GitHub activity via cached route handler (`/api/github`): commits/14d bars, language meters, last push, focus skill
 - [x] Now-playing row via Spotify (`/api/now-playing`, currently-playing → recently-played fallback) — degrades to "—" until env configured; `scripts/spotify-token.mjs` does the one-time refresh-token handshake
 - [x] reading / watching / playing rows via personal tracker (`/api/tracker`) — degrades until env configured

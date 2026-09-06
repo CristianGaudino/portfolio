@@ -6,7 +6,7 @@ export function toTitleCase(str: string) {
         .replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
-const BIRTH_DATE = new Date(`${SITE_CONFIG.birthDate}T00:00:00Z`);
+const BIRTH_DATE = new Date(SITE_CONFIG.birthDate);
 const CAREER_START = new Date(`${SITE_CONFIG.careerStart}T00:00:00Z`);
 
 /** Playful version string: years.months lived, e.g. `v27.6`. */
@@ -22,19 +22,26 @@ export function getVersion() {
     return { version: `v${years}.${months}` };
 }
 
-export function getCareerUptimeSeconds(): number {
-    return Math.floor((Date.now() - CAREER_START.getTime()) / 1000);
-}
+/** Calendar-accurate time since Cristiano was born, e.g. `27y 164d 21:03:41`. */
+export function getUptimeReadout(now: Date = new Date()): string {
+    const b = BIRTH_DATE;
+    const anniversary = (year: number) =>
+        Date.UTC(year, b.getUTCMonth(), b.getUTCDate(), b.getUTCHours(), b.getUTCMinutes(), b.getUTCSeconds());
 
-/** `4y 271d 04:12:33` */
-export function formatUptime(totalSeconds: number): string {
+    let years = now.getUTCFullYear() - b.getUTCFullYear();
+    let since = anniversary(now.getUTCFullYear());
+    if (since > now.getTime()) {
+        years -= 1;
+        since = anniversary(now.getUTCFullYear() - 1);
+    }
+
+    const rem = now.getTime() - since;
+    const days = Math.floor(rem / 86_400_000);
+    const h = Math.floor((rem % 86_400_000) / 3_600_000);
+    const m = Math.floor((rem % 3_600_000) / 60_000);
+    const s = Math.floor((rem % 60_000) / 1000);
     const pad = (n: number) => String(n).padStart(2, '0');
-    const days = Math.floor(totalSeconds / 86_400);
-    const years = Math.floor(days / 365);
-    const h = Math.floor((totalSeconds % 86_400) / 3_600);
-    const m = Math.floor((totalSeconds % 3_600) / 60);
-    const s = totalSeconds % 60;
-    return `${years}y ${days % 365}d ${pad(h)}:${pad(m)}:${pad(s)}`;
+    return `${years}y ${days}d ${pad(h)}:${pad(m)}:${pad(s)}`;
 }
 
 /** Relative time like `6h ago`, `3d ago`. */
