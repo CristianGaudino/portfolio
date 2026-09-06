@@ -21,7 +21,7 @@ Working log of what's built and what's next. Check things off as they land.
 - [x] Taller terminal on mobile (`46dvh`)
 
 ### System monitor
-- [x] Rebuilt as an htop/neofetch-style sectioned readout — SYSTEM / ACTIVITY / NOW
+- [x] htop/neofetch-style sectioned readout — SYSTEM (incl. status) + ACTIVITY + MEDIA (NOW section removed; audiod/procs/focus dropped as redundant)
 - [x] Reusable primitives (`components/ui/monitor.tsx`): `MonitorSection`, `StatRow`, `Meter`, `MeterList`, `Bars`, `Sparkline`, `Skeleton`, `Equalizer`
 - [x] ASCII portrait wired in (`public/ascii_portrait.png`)
 - [x] Real build info — `branch@sha` + build age, injected at build time via `next.config.ts`

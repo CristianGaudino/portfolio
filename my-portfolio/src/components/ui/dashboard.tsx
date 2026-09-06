@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
-import { FaArrowsRotate, FaGraduationCap, FaUserTie } from "react-icons/fa6";
-import { SKILLS } from "@/lib/definitions";
+import { FaGraduationCap, FaUserTie } from "react-icons/fa6";
 import { SITE_CONFIG } from "@/lib/config";
 import {
     formatRelative,
@@ -16,24 +15,13 @@ import {
 import { useJson, type AsyncState } from "@/lib/hooks";
 import type { GithubActivity } from "@/lib/github";
 import type { DeployStatus, NowPlaying, PeerInfo, SpotifyTop, TrackerStatus } from "@/lib/status";
-import {
-    Bars,
-    Equalizer,
-    Gauge,
-    Heatmap,
-    MeterList,
-    MonitorSection,
-    Skeleton,
-    StatRow,
-} from "@/components/ui/monitor";
+import { Bars, Gauge, Heatmap, MeterList, MonitorSection, Skeleton, StatRow } from "@/components/ui/monitor";
 
 const BUILD = {
     sha: process.env.NEXT_PUBLIC_GIT_SHA ?? "dev",
     ref: process.env.NEXT_PUBLIC_GIT_REF ?? "local",
     time: process.env.NEXT_PUBLIC_BUILD_TIME ?? "",
 };
-
-const DASH = "—";
 
 const STATUS_LABEL: Record<DevStatus, string> = {
     active: "ACTIVE",
@@ -99,7 +87,6 @@ export function Dashboard() {
                 <div className="min-w-0 flex-1 space-y-4">
                     <SystemSection data={data} />
                     <ActivitySection data={data} />
-                    <NowSection data={data} />
                     <MediaSection data={data} />
                 </div>
             </div>
@@ -163,6 +150,13 @@ function SystemSection({ data }: { data: DashboardData }) {
             <StatRow label="load">
                 {load === null ? <Skeleton className="h-3 w-32" /> : <Gauge value={load} />}
             </StatRow>
+            <StatRow label="status">
+                {!status ? (
+                    <Skeleton className="h-3 w-24" />
+                ) : (
+                    <span className={status.color}>● {STATUS_LABEL[status.status]}</span>
+                )}
+            </StatRow>
             <StatRow label="location">
                 {SITE_CONFIG.timezoneLabel}
                 {clock && <span className="text-beige-400"> · {clock}</span>}
@@ -191,25 +185,6 @@ function SystemSection({ data }: { data: DashboardData }) {
 function ActivitySection({ data }: { data: DashboardData }) {
     const { data: gh, loading } = data.gh;
     const unavailable = !loading && (!gh || gh.degraded);
-
-    const [focus, setFocus] = useState("");
-    const [pinned, setPinned] = useState(false);
-
-    useEffect(() => {
-        setFocus(SKILLS[Math.floor(Math.random() * SKILLS.length)]);
-    }, []);
-    useEffect(() => {
-        if (!pinned && gh?.languages[0]) setFocus(gh.languages[0].name);
-    }, [gh, pinned]);
-
-    const shuffleFocus = () => {
-        setPinned(true);
-        setFocus((prev) => {
-            let next = prev;
-            while (next === prev) next = SKILLS[Math.floor(Math.random() * SKILLS.length)];
-            return next;
-        });
-    };
 
     return (
         <MonitorSection title="activity">
@@ -270,94 +245,6 @@ function ActivitySection({ data }: { data: DashboardData }) {
                     </span>
                 )}
             </StatRow>
-
-            <StatRow label="focus">
-                <span className="inline-flex items-center gap-2">
-                    {focus || <Skeleton className="h-3 w-16" />}
-                    <button
-                        onClick={shuffleFocus}
-                        aria-label="Shuffle focus skill"
-                        title="Shuffle focus skill"
-                        className="text-purple-500 transition-colors hover:text-purple-300"
-                    >
-                        <FaArrowsRotate className="h-3 w-3" />
-                    </button>
-                </span>
-            </StatRow>
-        </MonitorSection>
-    );
-}
-
-function NowSection({ data }: { data: DashboardData }) {
-    const { np, tracker } = data;
-    const [status, setStatus] = useState<{ status: DevStatus; color: string } | null>(null);
-
-    useEffect(() => {
-        const tick = () => setStatus(getDevStatus());
-        tick();
-        const timer = setInterval(tick, 60_000);
-        return () => clearInterval(timer);
-    }, []);
-
-    const t = tracker.data;
-    const procs = [
-        t?.reading && { key: "reading.proc", item: t.reading },
-        t?.watching && { key: "watching.proc", item: t.watching },
-        t?.playing && { key: "playing.proc", item: t.playing },
-    ].filter(Boolean) as { key: string; item: NonNullable<TrackerStatus["reading"]> }[];
-
-    return (
-        <MonitorSection title="now">
-            <StatRow label="status">
-                {!status ? (
-                    <Skeleton className="h-3 w-24" />
-                ) : (
-                    <span className={status.color}>● {STATUS_LABEL[status.status]}</span>
-                )}
-            </StatRow>
-
-            <StatRow label="audiod">
-                {np.loading ? (
-                    <Skeleton className="h-3 w-44" />
-                ) : !np.data?.configured ? (
-                    <span className="text-beige-500">{DASH}</span>
-                ) : !np.data.playing ? (
-                    <span className="text-beige-500">idle</span>
-                ) : (
-                    <span className="inline-flex items-center gap-2">
-                        <Equalizer />
-                        <a
-                            href={np.data.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-beige-200 hover:underline"
-                        >
-                            {np.data.title}
-                        </a>
-                        <span className="text-beige-500">— {np.data.artist}</span>
-                    </span>
-                )}
-            </StatRow>
-
-            {tracker.loading ? (
-                <StatRow label="procs">
-                    <Skeleton className="h-3 w-40" />
-                </StatRow>
-            ) : procs.length ? (
-                procs.map(({ key, item }) => (
-                    <StatRow key={key} label={key}>
-                        {item.title}
-                        {item.detail && <span className="text-beige-500"> · {item.detail}</span>}
-                        {typeof item.progress === "number" && (
-                            <span className="text-purple-500"> · {item.progress}%</span>
-                        )}
-                    </StatRow>
-                ))
-            ) : (
-                <StatRow label="procs">
-                    <span className="text-beige-500">{DASH}</span>
-                </StatRow>
-            )}
         </MonitorSection>
     );
 }
