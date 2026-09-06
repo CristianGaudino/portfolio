@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Dashboard } from '@/components/ui/dashboard';
 import { FaGithub, FaLinkedin } from 'react-icons/fa6';
 import TerminalOutput from '@/components/ui/terminal-output';
@@ -20,6 +20,8 @@ export default function Home() {
     const [expandedCommand, setExpandedCommand] = useState<string | null>(null);
     const [xsView, setXsView] = useState<'files' | 'dashboard'>('files');
     const [focusedId, setFocusedId] = useState<string | null>(null);
+
+    const handleBooted = useCallback(() => setBooted(true), []);
 
     useEffect(() => {
         if (!booted) return;
@@ -94,7 +96,7 @@ export default function Home() {
             <div className="crt-overlay" aria-hidden />
             <div className="crt-vignette" aria-hidden />
 
-            {!booted && <BootScreen onDone={() => setBooted(true)} />}
+            {!booted && <BootScreen onDone={handleBooted} />}
 
             <div className={`flex h-full flex-col ${booted ? 'crt-power-on' : 'invisible'}`}>
                 {/* Files / dashboard toggle — shown until there's room for both side by side */}
@@ -175,7 +177,7 @@ export default function Home() {
                     </Window>
                 </main>
 
-                <div className="shrink-0 h-56 px-4 pb-2 sm:h-72">
+                <div className="shrink-0 h-[46dvh] px-4 pb-2 lg:h-72">
                     <TerminalOutput ref={termRef} />
                 </div>
 

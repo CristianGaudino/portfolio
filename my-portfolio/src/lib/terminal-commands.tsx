@@ -1,6 +1,17 @@
 import React from 'react';
 import { COMMANDS, ROOT_DIRS, findFile, findFolder, type FileType } from './definitions';
-import { formatUptime, getCareerUptimeSeconds } from './utils';
+import { SITE_CONFIG } from './config';
+import {
+    formatRelative,
+    formatUptime,
+    getCareerUptimeSeconds,
+    getDevStatus,
+    getLocalTime,
+    getVersion,
+} from './utils';
+import type { GithubActivity } from './github';
+import type { NowPlaying, TrackerStatus } from './status';
+import { Bars, MeterList } from '@/components/ui/monitor';
 
 export type CommandResult = {
     output?: React.ReactNode;
@@ -12,9 +23,36 @@ export type CommandResult = {
 type CommandSpec = {
     name: string;
     summary: string;
-    run: (args: string[], ctx: { cwd: string[]; raw: string }) => CommandResult;
+    run: (args: string[], ctx: { cwd: string[]; raw: string }) => CommandResult | Promise<CommandResult>;
     hidden?: boolean;
 };
+
+async function getJson<T>(url: string): Promise<T | null> {
+    try {
+        const res = await fetch(url);
+        return res.ok ? ((await res.json()) as T) : null;
+    } catch {
+        return null;
+    }
+}
+
+/** key / value row for the neofetch-style readouts */
+function Kv({ k, children }: { k: string; children: React.ReactNode }) {
+    return (
+        <div className="flex gap-2">
+            <span className="w-16 shrink-0 text-purple-300">{k}</span>
+            <span className="min-w-0 text-beige-200">{children}</span>
+        </div>
+    );
+}
+
+const NEOFETCH_ART = `  ┌───────────┐
+  │ ┌───────┐ │
+  │ │  >_   │ │
+  │ │       │ │
+  │ └───────┘ │
+  │ ▚ ▚ ▚ ▚ ▚ │
+  └───────────┘`;
 
 const TYPE_COLOR: Record<FileType, string> = {
     txt: 'text-term-blue',
@@ -214,6 +252,127 @@ const COMMAND_LIST: CommandSpec[] = [
         }),
     },
     {
+        name: 'neofetch',
+        summary: 'system readout',
+        run: async () => {
+            const [gh, np] = await Promise.all([
+                getJson<GithubActivity>('/api/github'),
+                getJson<NowPlaying>('/api/now-playing'),
+            ]);
+            const { status, color } = getDevStatus();
+            const langs =
+                gh && !gh.degraded && gh.languages.length
+                    ? gh.languages.map((l) => l.name).join(' · ')
+                    : '—';
+            const music =
+                np?.configured && (np.playing || np.title)
+                    ? `${np.title} — ${np.artist}${np.playing ? '' : ' (last played)'}`
+                    : 'idle';
+            return {
+                output: (
+                    <div className="flex flex-wrap gap-x-6 gap-y-2">
+                        <pre className="leading-tight text-purple-400 glow-soft">{NEOFETCH_ART}</pre>
+                        <div className="space-y-0.5">
+                            <Line>
+                                <span className="text-term-green">cristiano</span>
+                                <span className="text-beige-500">@</span>
+                                <span className="text-purple-300">cgaudino</span>
+                            </Line>
+                            <Line><span className="text-beige-600">─────────────────</span></Line>
+                            <Kv k="os">cgaudino.os <span className="text-purple-300">{getVersion().version}</span></Kv>
+                            <Kv k="host">{SITE_CONFIG.timezoneCity} · {getLocalTime()}</Kv>
+                            <Kv k="uptime">{formatUptime(getCareerUptimeSeconds())}</Kv>
+                            <Kv k="shell">zsh</Kv>
+                            <Kv k="langs">{langs}</Kv>
+                            <Kv k="music">{music}</Kv>
+                            <Kv k="status"><span className={color}>● {status.toUpperCase()}</span></Kv>
+                        </div>
+                    </div>
+                ),
+            };
+        },
+    },
+    {
+        name: 'stats',
+        summary: 'github activity snapshot',
+        run: async () => {
+            const gh = await getJson<GithubActivity>('/api/github');
+            if (!gh || gh.degraded) return err('stats: github activity unavailable');
+            return {
+                output: (
+                    <div className="space-y-1">
+                        <Line><span className="text-purple-300">github · last {SITE_CONFIG.activityDays} days</span></Line>
+                        <div className="flex items-center gap-2">
+                            <Bars data={gh.commitsPerDay} className="max-w-[180px] flex-1" />
+                            <span className="text-beige-400">{gh.commitTotal} commits</span>
+                        </div>
+                        {gh.languages.length > 0 && <MeterList items={gh.languages} />}
+                        {gh.lastPush && (
+                            <Line>
+                                <span className="text-beige-500">last push · </span>
+                                <a
+                                    href={gh.lastPush.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-term-blue underline"
+                                >
+                                    {gh.lastPush.repo}
+                                </a>
+                                <span className="text-beige-500"> · {formatRelative(gh.lastPush.at)}</span>
+                            </Line>
+                        )}
+                    </div>
+                ),
+            };
+        },
+    },
+    {
+        name: 'now',
+        summary: 'what cristiano is reading / watching / playing / hearing',
+        run: async () => {
+            const [np, tr] = await Promise.all([
+                getJson<NowPlaying>('/api/now-playing'),
+                getJson<TrackerStatus>('/api/tracker'),
+            ]);
+            const rows: React.ReactNode[] = [];
+
+            if (np?.configured) {
+                rows.push(
+                    <Kv k="music" key="music">
+                        {np.playing || np.title ? (
+                            <>
+                                {np.title} <span className="text-beige-500">— {np.artist}</span>
+                                {!np.playing && <span className="text-beige-500"> (last played)</span>}
+                            </>
+                        ) : (
+                            <span className="text-beige-500">idle</span>
+                        )}
+                    </Kv>,
+                );
+            }
+
+            ([['reading', tr?.reading], ['watching', tr?.watching], ['playing', tr?.playing]] as const).forEach(
+                ([k, item]) => {
+                    if (!item) return;
+                    rows.push(
+                        <Kv k={k} key={k}>
+                            {item.title}
+                            {item.detail && <span className="text-beige-500"> · {item.detail}</span>}
+                            {typeof item.progress === 'number' && (
+                                <span className="text-purple-500"> · {item.progress}%</span>
+                            )}
+                        </Kv>,
+                    );
+                },
+            );
+
+            if (!rows.length) {
+                return { output: <Line><span className="text-beige-500">nothing on right now — check back later</span></Line> };
+            }
+            return { output: <div className="space-y-0.5">{rows}</div> };
+        },
+    },
+    {
         name: 'date',
         summary: 'print the system date',
         run: () => ({ output: <Line>{new Date().toString()}</Line> }),
@@ -259,7 +418,7 @@ const COMMAND_MAP = new Map(COMMAND_LIST.map((c) => [c.name, c]));
 
 export const COMMAND_NAMES = COMMAND_LIST.filter((c) => !c.hidden).map((c) => c.name);
 
-export function runCommand(raw: string, cwd: string[]): CommandResult {
+export function runCommand(raw: string, cwd: string[]): CommandResult | Promise<CommandResult> {
     const trimmed = raw.trim();
     if (!trimmed) return {};
     const [name, ...args] = trimmed.split(/\s+/);

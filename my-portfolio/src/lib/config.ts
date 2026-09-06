@@ -4,7 +4,7 @@
  */
 export const SITE_CONFIG = {
     /** Canonical production URL — used for metadata / OG tags. */
-    siteUrl: 'https://cgaudino.com',
+    siteUrl: 'https://www.cgaudino.com',
 
     github: {
         user: 'CristianGaudino',

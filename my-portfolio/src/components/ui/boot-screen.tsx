@@ -27,13 +27,6 @@ const BOOT_LINES: BootLine[] = [
     { text: 'login: cristiano (auto)', hold: 260 },
 ];
 
-const SESSION_KEY = 'cgaudino.booted';
-
-function prefersReduced() {
-    return typeof window !== 'undefined'
-        && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-}
-
 function Tag({ tag }: { tag: BootLine['tag'] }) {
     if (!tag) return <span className="inline-block w-[62px]" />;
     const label = tag === 'ok' ? '  ok  ' : ' done ';
@@ -44,38 +37,25 @@ function Tag({ tag }: { tag: BootLine['tag'] }) {
     );
 }
 
+type Phase = 'run' | 'leaving' | 'gone';
+
 export function BootScreen({ onDone }: { onDone: () => void }) {
     const [count, setCount] = useState(0);
-    const [leaving, setLeaving] = useState(false);
-    const [gone, setGone] = useState(false);
-    const finished = useRef(false);
-    const reduced = useRef(false);
+    const [phase, setPhase] = useState<Phase>('run');
+    const doneRef = useRef(false);
 
     const finish = useCallback(() => {
-        if (finished.current) return;
-        finished.current = true;
-        try { sessionStorage.setItem(SESSION_KEY, '1'); } catch { /* ignore */ }
-        setLeaving(true);
+        if (doneRef.current) return;
+        doneRef.current = true;
+        setPhase('leaving');
         setTimeout(() => {
-            setGone(true);
+            setPhase('gone');
             onDone();
-        }, reduced.current ? 0 : 460);
+        }, 420);
     }, [onDone]);
 
-    // Skip immediately if we already booted this session, else register skip handlers.
+    // Any interaction skips the rest of the sequence.
     useEffect(() => {
-        reduced.current = !!prefersReduced();
-        let skippedEarly = false;
-        try {
-            if (sessionStorage.getItem(SESSION_KEY) === '1') {
-                skippedEarly = true;
-                finished.current = true;
-                setGone(true);
-                onDone();
-            }
-        } catch { /* ignore */ }
-        if (skippedEarly) return;
-
         const skip = () => finish();
         window.addEventListener('keydown', skip);
         window.addEventListener('pointerdown', skip);
@@ -83,22 +63,31 @@ export function BootScreen({ onDone }: { onDone: () => void }) {
             window.removeEventListener('keydown', skip);
             window.removeEventListener('pointerdown', skip);
         };
-    }, [finish, onDone]);
+    }, [finish]);
 
-    // Reveal lines one at a time.
+    // Reveal the log one line at a time (or all at once under reduced motion).
     useEffect(() => {
-        if (gone || finished.current) return;
-        if (count >= BOOT_LINES.length) {
-            const t = setTimeout(finish, reduced.current ? 0 : 500);
+        if (phase !== 'run') return;
+
+        const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+        if (reduced) {
+            setCount(BOOT_LINES.length);
+            const t = setTimeout(finish, 900);
             return () => clearTimeout(t);
         }
-        const line = BOOT_LINES[count];
-        const base = reduced.current ? 0 : line.text === '' ? 40 : 95;
-        const t = setTimeout(() => setCount((c) => c + 1), base + (reduced.current ? 0 : line.hold ?? 0));
-        return () => clearTimeout(t);
-    }, [count, gone, finish]);
 
-    if (gone) return null;
+        if (count >= BOOT_LINES.length) {
+            const t = setTimeout(finish, 480);
+            return () => clearTimeout(t);
+        }
+
+        const line = BOOT_LINES[count];
+        const delay = (line.text === '' ? 40 : 95) + (line.hold ?? 0);
+        const t = setTimeout(() => setCount((c) => c + 1), delay);
+        return () => clearTimeout(t);
+    }, [count, phase, finish]);
+
+    if (phase === 'gone') return null;
 
     const shown = BOOT_LINES.slice(0, count);
     const progress = Math.round((count / BOOT_LINES.length) * 100);
@@ -106,15 +95,23 @@ export function BootScreen({ onDone }: { onDone: () => void }) {
     return (
         <div
             className={`fixed inset-0 z-[80] flex items-center justify-center bg-black font-primary text-beige-300 transition-opacity duration-300 ${
-                leaving ? 'opacity-0' : 'opacity-100'
+                phase === 'leaving' ? 'opacity-0' : 'opacity-100'
             }`}
         >
-            <div className={`w-full max-w-xl px-6 ${reduced.current ? '' : 'crt-power-on'}`}>
+            <div className="crt-power-on w-full max-w-xl px-6">
                 <pre className="whitespace-pre-wrap text-sm leading-relaxed">
                     {shown.map((line, i) => (
                         <div key={i} className="flex gap-2">
                             {line.text !== '' && <Tag tag={line.tag} />}
-                            <span className={line.tag === 'done' ? 'text-term-green glow-soft' : i < 2 ? 'text-purple-300 glow-soft' : ''}>
+                            <span
+                                className={
+                                    line.tag === 'done'
+                                        ? 'text-term-green glow-soft'
+                                        : i < 2
+                                          ? 'text-purple-300 glow-soft'
+                                          : ''
+                                }
+                            >
                                 {line.text}
                             </span>
                         </div>

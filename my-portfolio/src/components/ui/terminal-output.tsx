@@ -7,6 +7,7 @@ import {
     prettyPath,
     resolvePath,
     runCommand,
+    type CommandResult,
 } from "@/lib/terminal-commands";
 import React, {
     useState,
@@ -32,6 +33,10 @@ function TypingContent({ node }: { node: React.ReactNode }) {
     const [revealed, setRevealed] = useState(REDUCED ? items.length : 0);
 
     useEffect(() => {
+        if (REDUCED) {
+            setRevealed(items.length);
+            return;
+        }
         if (revealed >= items.length) return;
         const delay = revealed === 0 ? 40 : 90;
         const timer = setTimeout(() => setRevealed((r) => r + 1), delay);
@@ -52,9 +57,12 @@ function TypingContent({ node }: { node: React.ReactNode }) {
 
 type Entry =
     | { id: number; kind: "echo"; prompt: string; command: string }
-    | { id: number; kind: "out"; content: React.ReactNode };
+    | { id: number; kind: "out"; content: React.ReactNode; rev?: number };
 
 type DistributiveOmit<T, K extends keyof T> = T extends unknown ? Omit<T, K> : never;
+
+/** What the scrollback should do after the next render. */
+type ScrollIntent = { type: "pin"; id: number } | { type: "bottom" } | null;
 
 function Prompt({ cwd, className = "" }: { cwd: string[]; className?: string }) {
     return (
@@ -84,22 +92,21 @@ const TerminalOutput = forwardRef<TerminalOutputHandle>((_, ref) => {
     const idRef = useRef(0);
     const cwdRef = useRef<string[]>([]);
     cwdRef.current = cwd;
-    /** id of an echo entry that should be pinned to the top of the viewport */
-    const pinToTopRef = useRef<number | null>(null);
+    const scrollIntentRef = useRef<ScrollIntent>(null);
 
     useLayoutEffect(() => {
         const el = containerRef.current;
         if (!el) return;
-        const pinId = pinToTopRef.current;
-        pinToTopRef.current = null;
-        if (pinId !== null) {
-            const node = el.querySelector<HTMLElement>(`[data-entry="${pinId}"]`);
-            if (node) {
-                el.scrollTop = Math.max(0, node.offsetTop - 8);
-                return;
-            }
+        const intent = scrollIntentRef.current;
+        scrollIntentRef.current = null;
+        if (!intent) return; // async content growing under a pinned command — leave scroll alone
+
+        if (intent.type === "pin") {
+            const node = el.querySelector<HTMLElement>(`[data-entry="${intent.id}"]`);
+            if (node) el.scrollTop = Math.max(0, node.offsetTop - 8);
+            return;
         }
-        // no command to pin — keep the newest output bottom-aligned in view
+        // bottom: keep the newest output resting on the viewport floor
         const spacer = spacerRef.current;
         el.scrollTop = spacer
             ? Math.max(0, spacer.offsetTop - el.clientHeight)
@@ -112,27 +119,21 @@ const TerminalOutput = forwardRef<TerminalOutputHandle>((_, ref) => {
         return id;
     }, []);
 
+    const updateEntry = useCallback((id: number, content: React.ReactNode) => {
+        setEntries((prev) =>
+            prev.map((e) =>
+                e.id === id && e.kind === "out" ? { ...e, content, rev: (e.rev ?? 0) + 1 } : e,
+            ),
+        );
+    }, []);
+
     const clearScreen = useCallback(() => {
         setEntries([]);
         setPadded(false);
     }, []);
 
-    const execute = useCallback(
-        (command: string, { echo = true }: { echo?: boolean } = {}) => {
-            const trimmed = command.trim();
-            const here = cwdRef.current;
-            if (echo) {
-                const echoId = push({ kind: "echo", prompt: prettyPath(here), command: trimmed });
-                if (trimmed) {
-                    pinToTopRef.current = echoId;
-                    setPadded(true);
-                }
-            }
-            if (!trimmed) return;
-
-            setHistory((h) => (h[h.length - 1] === trimmed ? h : [...h, trimmed]));
-
-            const result = runCommand(trimmed, here);
+    const applyResult = useCallback(
+        (result: CommandResult, pendingId: number | null) => {
             if (result.clear) {
                 clearScreen();
                 return;
@@ -141,13 +142,51 @@ const TerminalOutput = forwardRef<TerminalOutputHandle>((_, ref) => {
                 setCwd(result.cwd);
                 cwdRef.current = result.cwd;
             }
-            if (result.output !== undefined) push({ kind: "out", content: result.output });
+            if (pendingId !== null) {
+                updateEntry(pendingId, result.output ?? <span className="text-beige-500">done</span>);
+            } else if (result.output !== undefined) {
+                push({ kind: "out", content: result.output });
+            }
         },
-        [push, clearScreen],
+        [clearScreen, push, updateEntry],
+    );
+
+    const execute = useCallback(
+        (command: string, { echo = true }: { echo?: boolean } = {}) => {
+            const trimmed = command.trim();
+            const here = cwdRef.current;
+            if (echo) {
+                const echoId = push({ kind: "echo", prompt: prettyPath(here), command: trimmed });
+                if (trimmed) {
+                    scrollIntentRef.current = { type: "pin", id: echoId };
+                    setPadded(true);
+                }
+            }
+            if (!trimmed) return;
+
+            setHistory((h) => (h[h.length - 1] === trimmed ? h : [...h, trimmed]));
+
+            const result = runCommand(trimmed, here);
+            if (result instanceof Promise) {
+                const pendingId = push({
+                    kind: "out",
+                    content: <span className="animate-pulse text-beige-500">…</span>,
+                });
+                result
+                    .then((r) => applyResult(r, pendingId))
+                    .catch(() => updateEntry(pendingId, <span className="text-term-red">command failed</span>));
+                return;
+            }
+            applyResult(result, null);
+        },
+        [push, applyResult, updateEntry],
     );
 
     useImperativeHandle(ref, () => ({
-        print: (content: React.ReactNode) => push({ kind: "out", content }),
+        print: (content: React.ReactNode) => {
+            scrollIntentRef.current = { type: "bottom" };
+            push({ kind: "out", content });
+        },
         clear: clearScreen,
         run: (command: string) => execute(command),
         focus: () => inputRef.current?.focus(),
@@ -168,7 +207,10 @@ const TerminalOutput = forwardRef<TerminalOutputHandle>((_, ref) => {
         if (tokens.length <= 1) {
             const matches = COMMAND_NAMES.filter((n) => n.startsWith(editing));
             if (matches.length === 1) setInput(matches[0] + " ");
-            else if (matches.length > 1) push({ kind: "out", content: <span className="text-beige-500">{matches.join("   ")}</span> });
+            else if (matches.length > 1) {
+                scrollIntentRef.current = { type: "bottom" };
+                push({ kind: "out", content: <span className="text-beige-500">{matches.join("   ")}</span> });
+            }
             return;
         }
 
@@ -184,6 +226,7 @@ const TerminalOutput = forwardRef<TerminalOutputHandle>((_, ref) => {
             parts[parts.length - 1] = completed;
             setInput(parts.join(""));
         } else if (options.length > 1) {
+            scrollIntentRef.current = { type: "bottom" };
             push({ kind: "out", content: <span className="text-beige-500">{options.join("   ")}</span> });
         }
     };
@@ -246,15 +289,15 @@ const TerminalOutput = forwardRef<TerminalOutputHandle>((_, ref) => {
                                 <span className="text-beige-500">@</span>
                                 <span className="text-purple-300">cgaudino</span>{" "}
                                 <span className="text-term-blue">{entry.prompt}</span>
-                                <span className="text-beige-500"> $ </span>
+                                <span className="text-beige-500"> $</span>
                             </span>
-                            <span className="text-beige-200">{entry.command}</span>
+                            <span className="ml-1.5 text-beige-200">{entry.command}</span>
                         </div>
                     ) : (
                         <div key={entry.id} data-entry={entry.id} className="flex items-start">
                             <span className="shrink-0 select-none text-purple-500">&gt;</span>
                             <div className="ml-2 min-w-0 break-words">
-                                <TypingContent node={entry.content} />
+                                <TypingContent key={entry.rev ?? 0} node={entry.content} />
                             </div>
                         </div>
                     ),

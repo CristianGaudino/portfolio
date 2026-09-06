@@ -5,16 +5,18 @@ Working log of what's built and what's next. Check things off as they land.
 ## Done
 
 ### Boot & atmosphere
-- [x] Typed boot sequence: progress bar, CRT power-on, skip-on-keypress, once-per-session
+- [x] Typed boot sequence: progress bar, CRT power-on, skip on any key/tap, plays on every load (no persistent skip); static hold under reduced-motion
 - [x] CRT overlay — scanlines, vignette, flicker, accent text-glow (all respect `prefers-reduced-motion`)
 - [x] Shared `Window` chrome (traffic lights + title) on every panel
 
 ### Terminal
 - [x] Interactive shell: `help`, `ls`, `cd`, `cat`, `open`, `tree`, `pwd`, `whoami`, `uptime`, `date`, `echo`, `clear`
+- [x] Async commands supported (loading placeholder → in-place update): `neofetch`, `stats`, `now` print live monitor data
 - [x] Easter eggs: `sudo`, `rm`, `exit`, `hello`
 - [x] History (↑/↓), Tab autocomplete, Ctrl+L
-- [x] File-tree clicks route through the terminal; command pinned to top of scrollback on run
+- [x] File-tree clicks route through the terminal; command pinned to top of scrollback on run (explicit scroll-intent model, survives async updates)
 - [x] `open` shows links, never auto-navigates
+- [x] Taller terminal on mobile (`46dvh`)
 
 ### System monitor
 - [x] Rebuilt as an htop/neofetch-style sectioned readout — SYSTEM / ACTIVITY / NOW
@@ -49,7 +51,6 @@ Working log of what's built and what's next. Check things off as they land.
 - [ ] "processes" table from recent GitHub repos (name, language, last-touched), repo-id as PID
 
 ### Terminal
-- [ ] Async commands so `neofetch` / `stats` / `now` can print live monitor data
 - [ ] `theme` command — green / amber / purple CRT palettes
 - [ ] Optional muted keystroke SFX (off by default)
 
