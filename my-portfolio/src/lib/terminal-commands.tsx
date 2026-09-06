@@ -363,26 +363,39 @@ const COMMAND_LIST: CommandSpec[] = [
     },
     {
         name: 'faves',
-        summary: "cristiano's year in media",
+        summary: "cristiano's top-rated media of the past year",
         run: async () => {
             const [tr, top] = await Promise.all([
                 getJson<TrackerStatus>('/api/tracker'),
                 getJson<SpotifyTop>('/api/spotify-top'),
             ]);
-            const year = tr?.year;
+            const fav = tr?.favourites;
             const rows: React.ReactNode[] = [];
 
-            ([['album', year?.album], ['film', year?.film], ['series', year?.series], ['game', year?.game]] as const).forEach(
-                ([k, item]) => {
-                    if (!item) return;
-                    rows.push(
-                        <Kv k={k} key={k}>
-                            {item.title}
-                            {item.detail && <span className="text-beige-500"> — {item.detail}</span>}
-                        </Kv>,
-                    );
-                },
-            );
+            ([
+                ['album', fav?.album],
+                ['film', fav?.film],
+                ['series', fav?.series],
+                ['game', fav?.game],
+                ['book', fav?.book],
+            ] as const).forEach(([k, items]) => {
+                if (!items?.length) return;
+                rows.push(
+                    <Kv k={k} key={k}>
+                        <span className="flex flex-col">
+                            {items.slice(0, 3).map((it, i) => (
+                                <span key={i}>
+                                    {it.title}
+                                    {it.detail && <span className="text-beige-500"> — {it.detail}</span>}
+                                </span>
+                            ))}
+                            {items.length > 3 && (
+                                <span className="text-beige-600">+{items.length - 3} more</span>
+                            )}
+                        </span>
+                    </Kv>,
+                );
+            });
 
             if (top?.artist) {
                 rows.push(
@@ -405,7 +418,7 @@ const COMMAND_LIST: CommandSpec[] = [
             return {
                 output: (
                     <div className="space-y-0.5">
-                        <Line><span className="text-purple-300">cristiano&apos;s last 12 months</span></Line>
+                        <Line><span className="text-purple-300">cristiano&apos;s past year in media</span></Line>
                         {rows}
                     </div>
                 ),

@@ -250,23 +250,29 @@ function ActivitySection({ data }: { data: DashboardData }) {
 }
 
 function MediaSection({ data }: { data: DashboardData }) {
-    const year = data.tracker.data?.year;
+    const favourites = data.tracker.data?.favourites;
     const top = data.top.data;
     const rows: { k: string; node: ReactNode }[] = [];
 
-    (["album", "film", "series", "game"] as const).forEach((k) => {
-        const item = year?.[k];
-        if (item) {
-            rows.push({
-                k,
-                node: (
-                    <>
-                        {item.title}
-                        {item.detail && <span className="text-beige-500"> — {item.detail}</span>}
-                    </>
-                ),
-            });
-        }
+    (["album", "film", "series", "game", "book"] as const).forEach((k) => {
+        const items = favourites?.[k];
+        if (!items?.length) return;
+        rows.push({
+            k,
+            node: (
+                <span className="flex flex-col">
+                    {items.slice(0, 3).map((it, i) => (
+                        <span key={i}>
+                            {it.title}
+                            {it.detail && <span className="text-beige-500"> — {it.detail}</span>}
+                        </span>
+                    ))}
+                    {items.length > 3 && (
+                        <span className="text-beige-600">+{items.length - 3} more</span>
+                    )}
+                </span>
+            ),
+        });
     });
 
     if (top?.artist) {
@@ -290,7 +296,7 @@ function MediaSection({ data }: { data: DashboardData }) {
     if (!rows.length) return null;
 
     return (
-        <MonitorSection title="media · last 12 months">
+        <MonitorSection title="media · past year">
             {rows.map(({ k, node }) => (
                 <StatRow key={k} label={k}>
                     {node}

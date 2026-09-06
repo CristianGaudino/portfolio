@@ -16,12 +16,13 @@ export type TrackedItem = {
     progress?: number;
 };
 
-/** Favourites of the past year, from the tracker site. */
-export type YearFaves = {
-    album?: TrackedItem;
-    film?: TrackedItem;
-    series?: TrackedItem;
-    game?: TrackedItem;
+/** Top-rated media of the last year, per category. Arrays — ties are all returned. */
+export type Favourites = {
+    album?: TrackedItem[];
+    film?: TrackedItem[];
+    series?: TrackedItem[];
+    game?: TrackedItem[];
+    book?: TrackedItem[];
 };
 
 export type TrackerStatus = {
@@ -29,7 +30,7 @@ export type TrackerStatus = {
     reading?: TrackedItem;
     watching?: TrackedItem;
     playing?: TrackedItem;
-    year?: YearFaves;
+    favourites?: Favourites;
 };
 
 export type SpotifyTop = {
@@ -149,7 +150,7 @@ export async function fetchTrackerStatus(): Promise<TrackerStatus> {
             reading: json.reading,
             watching: json.watching,
             playing: json.playing,
-            year: json.year,
+            favourites: json.favourites,
         };
     } catch {
         return { configured: false };
