@@ -19,6 +19,8 @@ import React, {
     useCallback,
 } from "react";
 import { Window } from "@/components/ui/window";
+import { useKeystrokeSound } from "@/lib/use-keystroke-sound";
+import { FaVolumeHigh, FaVolumeXmark } from "react-icons/fa6";
 
 const REDUCED =
     typeof window !== "undefined" &&
@@ -82,6 +84,7 @@ type TerminalOutputProps = {
 };
 
 const TerminalOutput = forwardRef<TerminalOutputHandle, TerminalOutputProps>(({ onCollapse }, ref) => {
+    const sfx = useKeystrokeSound();
     const [entries, setEntries] = useState<Entry[]>([]);
     const [cwd, setCwd] = useState<string[]>([]);
     const [input, setInput] = useState("");
@@ -243,6 +246,8 @@ const TerminalOutput = forwardRef<TerminalOutputHandle, TerminalOutputProps>(({ 
     };
 
     const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (!e.repeat && !["Shift", "Control", "Alt", "Meta", "CapsLock"].includes(e.key)) sfx.play();
+
         if (e.key === "Enter") {
             execute(input);
             setInput("");
@@ -280,12 +285,22 @@ const TerminalOutput = forwardRef<TerminalOutputHandle, TerminalOutputProps>(({ 
             bodyClassName="flex flex-col bg-black/95"
             onCollapse={onCollapse}
             right={
-                <button
-                    onClick={clearScreen}
-                    className="rounded border border-purple-600 px-2 py-0.5 text-[0.7rem] text-purple-300 transition-colors hover:border-purple-300 hover:text-white"
-                >
-                    clear
-                </button>
+                <span className="flex items-center gap-2">
+                    <button
+                        onClick={sfx.toggle}
+                        aria-label={sfx.enabled ? "Mute keystrokes" : "Enable keystroke sound"}
+                        title={sfx.enabled ? "Mute keystrokes" : "Enable keystroke sound"}
+                        className={`transition-colors ${sfx.enabled ? "text-purple-300 hover:text-white" : "text-beige-600 hover:text-beige-400"}`}
+                    >
+                        {sfx.enabled ? <FaVolumeHigh className="h-3 w-3" /> : <FaVolumeXmark className="h-3 w-3" />}
+                    </button>
+                    <button
+                        onClick={clearScreen}
+                        className="rounded border border-purple-600 px-2 py-0.5 text-[0.7rem] text-purple-300 transition-colors hover:border-purple-300 hover:text-white"
+                    >
+                        clear
+                    </button>
+                </span>
             }
         >
             <div

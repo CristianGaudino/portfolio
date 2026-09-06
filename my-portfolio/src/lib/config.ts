@@ -15,6 +15,8 @@ export const SITE_CONFIG = {
     /** IANA timezone the "host" runs in — drives the clock and derived status. */
     timezone: 'Europe/Dublin',
     timezoneCity: 'Dublin',
+    /** Host coordinates — used to show a visitor's distance from the "host". */
+    hostGeo: { lat: 53.3498, lon: -6.2603 },
 
     /** Anchor dates (ISO, UTC midnight assumed). */
     birthDate: '1999-03-26',
@@ -39,4 +41,6 @@ export const SITE_CONFIG = {
 
     /** Window over which GitHub commit activity is charted. */
     activityDays: 14,
+    /** Weeks shown in the contribution heatmap. */
+    heatmapWeeks: 14,
 } as const;

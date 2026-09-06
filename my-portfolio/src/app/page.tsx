@@ -128,7 +128,7 @@ export default function Home() {
                     {/* File tree */}
                     <Window
                         title="~/cristiano_gaudino"
-                        className={`w-full lg:w-1/2 ${xsView === 'files' ? 'flex' : 'hidden'} lg:flex`}
+                        className={`w-full lg:w-1/2 ${xsView === 'files' ? 'flex' : 'hidden'} lg:flex ${booted ? 'enter-a' : ''}`}
                         bodyClassName="overflow-y-auto p-4"
                         onCollapse={setFilesCollapsed}
                     >
@@ -179,7 +179,7 @@ export default function Home() {
                     {/* Dashboard */}
                     <Window
                         title="system-monitor"
-                        className={`w-full lg:w-1/2 ${xsView === 'dashboard' ? 'flex' : 'hidden'} lg:flex`}
+                        className={`w-full lg:w-1/2 ${xsView === 'dashboard' ? 'flex' : 'hidden'} lg:flex ${booted ? 'enter-b' : ''}`}
                         bodyClassName="flex overflow-hidden"
                         onCollapse={setMonitorCollapsed}
                     >
@@ -188,7 +188,7 @@ export default function Home() {
                 </main>
 
                 <div
-                    className={`px-4 pb-2 ${
+                    className={`px-4 pb-2 ${booted ? 'enter-c' : ''} ${
                         termCollapsed
                             ? 'shrink-0 h-auto'
                             : topAllCollapsed

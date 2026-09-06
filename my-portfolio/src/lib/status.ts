@@ -39,6 +39,20 @@ export type SpotifyTop = {
     track?: string;
 };
 
+export type PeerInfo = {
+    available: boolean;
+    city?: string | null;
+    country?: string | null;
+    km?: number | null;
+};
+
+export type DeployStatus = {
+    configured: boolean;
+    state?: string;
+    at?: string;
+    url?: string;
+};
+
 type SpotifyTrack = {
     name: string;
     external_urls?: { spotify?: string };

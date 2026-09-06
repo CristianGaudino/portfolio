@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { FaArrowsRotate, FaGraduationCap, FaUserTie } from "react-icons/fa6";
 import { SKILLS } from "@/lib/definitions";
 import { SITE_CONFIG } from "@/lib/config";
@@ -14,12 +14,14 @@ import {
     getVersion,
     type DevStatus,
 } from "@/lib/utils";
-import { useJson } from "@/lib/hooks";
+import { useJson, type AsyncState } from "@/lib/hooks";
 import type { GithubActivity } from "@/lib/github";
-import type { NowPlaying, TrackerStatus } from "@/lib/status";
+import type { DeployStatus, NowPlaying, PeerInfo, SpotifyTop, TrackerStatus } from "@/lib/status";
 import {
     Bars,
     Equalizer,
+    Gauge,
+    Heatmap,
     MeterList,
     MonitorSection,
     Skeleton,
@@ -34,7 +36,50 @@ const BUILD = {
 
 const DASH = "—";
 
+const STATUS_LABEL: Record<DevStatus, string> = {
+    active: "ACTIVE",
+    idle: "IDLE",
+    offline: "OFFLINE",
+};
+
+type DashboardData = {
+    gh: AsyncState<GithubActivity>;
+    np: AsyncState<NowPlaying>;
+    tracker: AsyncState<TrackerStatus>;
+    top: AsyncState<SpotifyTop>;
+    peer: AsyncState<PeerInfo>;
+    deploy: AsyncState<DeployStatus>;
+};
+
+function useDashboardData(): DashboardData {
+    return {
+        gh: useJson<GithubActivity>("/api/github", SITE_CONFIG.poll.activity),
+        np: useJson<NowPlaying>("/api/now-playing", SITE_CONFIG.poll.nowPlaying),
+        tracker: useJson<TrackerStatus>("/api/tracker", SITE_CONFIG.poll.tracker),
+        top: useJson<SpotifyTop>("/api/spotify-top"),
+        peer: useJson<PeerInfo>("/api/peer"),
+        deploy: useJson<DeployStatus>("/api/deploy"),
+    };
+}
+
+/** Fake "load average" from real inputs — time of day, commits today, whether music is on. */
+function systemLoad(status: DevStatus, gh: GithubActivity | undefined, playing: boolean): number {
+    let load = status === "active" ? 0.62 : status === "idle" ? 0.38 : 0.11;
+    load += Math.min(0.6, (gh?.commitsPerDay.at(-1) ?? 0) * 0.12);
+    if (playing) load += 0.15;
+    load += (new Date().getMinutes() % 7) * 0.01; // gentle breathing
+    return Math.round(load * 100) / 100;
+}
+
+function pidFor(name: string): number {
+    let h = 0;
+    for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) | 0;
+    return 1000 + (Math.abs(h) % 9000);
+}
+
 export function Dashboard() {
+    const data = useDashboardData();
+
     return (
         <div className="h-full w-full overflow-y-auto p-4 text-beige-300">
             <div className="flex gap-4">
@@ -59,18 +104,22 @@ export function Dashboard() {
                 </div>
 
                 <div className="min-w-0 flex-1 space-y-4">
-                    <SystemSection />
-                    <ActivitySection />
-                    <NowSection />
+                    <SystemSection data={data} />
+                    <ActivitySection data={data} />
+                    <ProcessSection data={data} />
+                    <NowSection data={data} />
+                    <MediaSection data={data} />
                 </div>
             </div>
         </div>
     );
 }
 
-function SystemSection() {
+function SystemSection({ data }: { data: DashboardData }) {
+    const { gh, np, peer, deploy } = data;
     const [uptime, setUptime] = useState<number | null>(null);
     const [clock, setClock] = useState<string | null>(null);
+    const [status, setStatus] = useState<{ status: DevStatus; color: string } | null>(null);
     const { version } = getVersion();
     const professionalYears = getProfessionalYears();
 
@@ -78,20 +127,22 @@ function SystemSection() {
         const tick = () => {
             setUptime(getCareerUptimeSeconds());
             setClock(getLocalTime());
+            setStatus(getDevStatus());
         };
         tick();
         const timer = setInterval(tick, 1000);
         return () => clearInterval(timer);
     }, []);
 
+    const load = status ? systemLoad(status.status, gh.data, np.data?.playing ?? false) : null;
+    const d = deploy.data;
+    const p = peer.data;
+
     return (
         <MonitorSection title="system">
             <StatRow label="os">
                 cgaudino.os{" "}
-                <span
-                    className="text-purple-300"
-                    title={`v = years.months since ${SITE_CONFIG.birthDate}`}
-                >
+                <span className="text-purple-300" title={`v = years.months since ${SITE_CONFIG.birthDate}`}>
                     {version}
                 </span>
             </StatRow>
@@ -106,13 +157,30 @@ function SystemSection() {
                 </a>
                 {BUILD.time && <span className="text-beige-500"> · built {formatRelative(BUILD.time)}</span>}
             </StatRow>
+            {d?.configured && d.state && (
+                <StatRow label="deploy">
+                    <span className={d.state === "ready" ? "text-term-green" : d.state === "error" ? "text-term-red" : "text-term-amber"}>
+                        {d.state}
+                    </span>
+                    {d.at && <span className="text-beige-500"> · {formatRelative(d.at)}</span>}
+                </StatRow>
+            )}
             <StatRow label="uptime">
                 {uptime === null ? <Skeleton className="h-3 w-40" /> : formatUptime(uptime)}
+            </StatRow>
+            <StatRow label="load">
+                {load === null ? <Skeleton className="h-3 w-32" /> : <Gauge value={load} />}
             </StatRow>
             <StatRow label="location">
                 {SITE_CONFIG.timezoneCity}
                 {clock && <span className="text-beige-400"> · {clock}</span>}
             </StatRow>
+            {p?.available && (p.city || p.km != null) && (
+                <StatRow label="peer">
+                    {p.city ? `${p.city}${p.country ? `, ${p.country}` : ""}` : "connected"}
+                    {p.km != null && <span className="text-beige-500"> · ~{p.km.toLocaleString()} km</span>}
+                </StatRow>
+            )}
             <StatRow label="experience">
                 <span className="inline-flex items-center gap-2">
                     <span className="inline-flex items-center gap-1" title="Academic">
@@ -128,9 +196,9 @@ function SystemSection() {
     );
 }
 
-function ActivitySection() {
-    const { data, loading } = useJson<GithubActivity>("/api/github", SITE_CONFIG.poll.activity);
-    const unavailable = !loading && (!data || data.degraded);
+function ActivitySection({ data }: { data: DashboardData }) {
+    const { data: gh, loading } = data.gh;
+    const unavailable = !loading && (!gh || gh.degraded);
 
     const [focus, setFocus] = useState("");
     const [pinned, setPinned] = useState(false);
@@ -139,8 +207,8 @@ function ActivitySection() {
         setFocus(SKILLS[Math.floor(Math.random() * SKILLS.length)]);
     }, []);
     useEffect(() => {
-        if (!pinned && data?.languages[0]) setFocus(data.languages[0].name);
-    }, [data, pinned]);
+        if (!pinned && gh?.languages[0]) setFocus(gh.languages[0].name);
+    }, [gh, pinned]);
 
     const shuffleFocus = () => {
         setPinned(true);
@@ -160,40 +228,53 @@ function ActivitySection() {
                     <span className="text-beige-500">unavailable</span>
                 ) : (
                     <span className="flex items-center gap-2">
-                        <Bars data={data!.commitsPerDay} className="flex-1" />
-                        <span className="text-beige-400">{data!.commitTotal}</span>
+                        <Bars data={gh!.commitsPerDay} className="flex-1" />
+                        <span className="text-beige-400">{gh!.commitTotal}</span>
                     </span>
                 )}
             </StatRow>
 
+            {(loading || gh?.contributions) && (
+                <StatRow label={`${SITE_CONFIG.heatmapWeeks}w`}>
+                    {loading ? (
+                        <Skeleton className="h-14 w-full" />
+                    ) : gh?.contributions ? (
+                        <span className="inline-flex items-center gap-2">
+                            <Heatmap days={gh.contributions.days} />
+                            <span className="text-beige-500">{gh.contributions.total}</span>
+                        </span>
+                    ) : null}
+                </StatRow>
+            )}
+
             <StatRow label="languages">
                 {loading ? (
                     <Skeleton className="h-12 w-full" />
-                ) : unavailable || !data!.languages.length ? (
+                ) : unavailable || !gh!.languages.length ? (
                     <span className="text-beige-500">unavailable</span>
                 ) : (
-                    <MeterList items={data!.languages} />
+                    <MeterList items={gh!.languages} />
                 )}
             </StatRow>
 
             <StatRow label="last push">
                 {loading ? (
                     <Skeleton className="h-3 w-52" />
-                ) : unavailable || !data!.lastPush ? (
+                ) : unavailable || !gh!.lastPush ? (
                     <span className="text-beige-500">unavailable</span>
                 ) : (
                     <span>
                         <a
-                            href={data!.lastPush.url}
+                            href={gh!.lastPush.url}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-term-blue underline"
                         >
-                            {data!.lastPush.repo}
+                            {gh!.lastPush.repo}
                         </a>{" "}
-                        <span className="text-beige-500">{formatRelative(data!.lastPush.at)}</span>
+                        <span className="text-beige-500">{formatRelative(gh!.lastPush.at)}</span>
                         <br />
-                        <span className="text-beige-300">{data!.lastPush.message}</span>
+                        <span className="text-beige-300">{gh!.lastPush.message}</span>
                     </span>
                 )}
             </StatRow>
@@ -215,16 +296,38 @@ function ActivitySection() {
     );
 }
 
-const STATUS_LABEL: Record<DevStatus, string> = {
-    active: "ACTIVE",
-    idle: "IDLE",
-    offline: "OFFLINE",
-};
+function ProcessSection({ data }: { data: DashboardData }) {
+    const { data: gh } = data.gh;
+    if (!gh?.repos.length) return null;
 
-function NowSection() {
+    return (
+        <MonitorSection title="processes">
+            <div className="space-y-0.5 text-sm">
+                <div className="flex gap-3 text-[0.7rem] uppercase tracking-wider text-beige-600">
+                    <span className="w-12 shrink-0">pid</span>
+                    <span className="min-w-0 flex-1">name</span>
+                    <span className="w-24 shrink-0">touched</span>
+                </div>
+                {gh.repos.map((r) => (
+                    <div key={r.name} className="flex gap-3 leading-snug">
+                        <span className="w-12 shrink-0 tabular-nums text-purple-500">{pidFor(r.name)}</span>
+                        <span className="min-w-0 flex-1 truncate">
+                            <a href={r.url} target="_blank" rel="noopener noreferrer" className="text-beige-200 hover:underline">
+                                {r.name}
+                            </a>
+                            {r.language && <span className="text-beige-500"> · {r.language}</span>}
+                        </span>
+                        <span className="w-24 shrink-0 text-beige-500">{formatRelative(r.pushedAt)}</span>
+                    </div>
+                ))}
+            </div>
+        </MonitorSection>
+    );
+}
+
+function NowSection({ data }: { data: DashboardData }) {
+    const { np, tracker } = data;
     const [status, setStatus] = useState<{ status: DevStatus; color: string } | null>(null);
-    const np = useJson<NowPlaying>("/api/now-playing", SITE_CONFIG.poll.nowPlaying);
-    const tracker = useJson<TrackerStatus>("/api/tracker", SITE_CONFIG.poll.tracker);
 
     useEffect(() => {
         const tick = () => setStatus(getDevStatus());
@@ -294,6 +397,57 @@ function NowSection() {
                     <span className="text-beige-500">{DASH}</span>
                 </StatRow>
             )}
+        </MonitorSection>
+    );
+}
+
+function MediaSection({ data }: { data: DashboardData }) {
+    const year = data.tracker.data?.year;
+    const top = data.top.data;
+    const rows: { k: string; node: ReactNode }[] = [];
+
+    (["album", "film", "series", "game"] as const).forEach((k) => {
+        const item = year?.[k];
+        if (item) {
+            rows.push({
+                k,
+                node: (
+                    <>
+                        {item.title}
+                        {item.detail && <span className="text-beige-500"> — {item.detail}</span>}
+                    </>
+                ),
+            });
+        }
+    });
+
+    if (top?.artist) {
+        rows.push({
+            k: "artist",
+            node: (
+                <>
+                    {top.artistUrl ? (
+                        <a href={top.artistUrl} target="_blank" rel="noopener noreferrer" className="text-term-blue underline">
+                            {top.artist}
+                        </a>
+                    ) : (
+                        top.artist
+                    )}
+                    <span className="text-beige-500"> · most played</span>
+                </>
+            ),
+        });
+    }
+
+    if (!rows.length) return null;
+
+    return (
+        <MonitorSection title="media · last 12 months">
+            {rows.map(({ k, node }) => (
+                <StatRow key={k} label={k}>
+                    {node}
+                </StatRow>
+            ))}
         </MonitorSection>
     );
 }

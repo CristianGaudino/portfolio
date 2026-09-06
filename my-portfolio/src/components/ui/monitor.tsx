@@ -94,6 +94,55 @@ export function Skeleton({ className = '' }: { className?: string }) {
     return <span className={`inline-block animate-pulse rounded bg-beige-700/60 ${className}`} />;
 }
 
+const GAUGE_TONE = (v: number) =>
+    v < 0.8 ? 'bg-term-green' : v < 1.4 ? 'bg-term-amber' : 'bg-term-red';
+
+/** load-average style gauge, 0 → `max`. */
+export function Gauge({ value, max = 2 }: { value: number; max?: number }) {
+    const pct = Math.max(0, Math.min(100, (value / max) * 100));
+    return (
+        <span className="inline-flex items-center gap-2">
+            <span className="relative h-1.5 w-24 overflow-hidden rounded-sm bg-purple-900">
+                <span
+                    className={`absolute inset-y-0 left-0 rounded-sm glow-soft ${GAUGE_TONE(value)}`}
+                    style={{ width: `${pct}%` }}
+                />
+            </span>
+            <span className="tabular-nums text-beige-200">{value.toFixed(2)}</span>
+        </span>
+    );
+}
+
+const HEAT_TONE = ['bg-purple-900', 'bg-purple-700', 'bg-purple-600', 'bg-purple-400', 'bg-purple-300'];
+
+/** GitHub-style contribution grid. `days` is oldest → newest, length a multiple of 7-ish. */
+export function Heatmap({ days }: { days: { date: string; count: number; level: number }[] }) {
+    // pad the front so the first column starts on a week boundary
+    const firstDow = days.length ? new Date(days[0].date).getUTCDay() : 0;
+    const padded = [...Array<null>(firstDow).fill(null), ...days];
+    const weeks: (typeof days[number] | null)[][] = [];
+    for (let i = 0; i < padded.length; i += 7) weeks.push(padded.slice(i, i + 7));
+
+    return (
+        <span className="inline-flex gap-[3px]" aria-hidden>
+            {weeks.map((week, wi) => (
+                <span key={wi} className="flex flex-col gap-[3px]">
+                    {Array.from({ length: 7 }, (_, di) => {
+                        const cell = week[di];
+                        return (
+                            <span
+                                key={di}
+                                className={`h-2 w-2 rounded-[2px] ${cell ? HEAT_TONE[cell.level] : 'bg-transparent'}`}
+                                title={cell ? `${cell.count} on ${cell.date}` : undefined}
+                            />
+                        );
+                    })}
+                </span>
+            ))}
+        </span>
+    );
+}
+
 /** Little animated bars for the "now playing" row. */
 export function Equalizer({ playing = true }: { playing?: boolean }) {
     return (

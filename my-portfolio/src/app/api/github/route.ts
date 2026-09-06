@@ -11,6 +11,7 @@ function fallback(): GithubActivity {
         commitTotal: 0,
         languages: [],
         repos: [],
+        contributions: null,
         generatedAt: new Date().toISOString(),
         degraded: true,
     };

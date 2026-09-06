@@ -438,6 +438,36 @@ const COMMAND_LIST: CommandSpec[] = [
         summary: 'clear the screen',
         run: () => ({ clear: true }),
     },
+    {
+        name: 'sound',
+        summary: 'keystroke clicks — sound [on|off]',
+        run: (args) => {
+            const arg = (args[0] ?? '').toLowerCase();
+            let want: boolean;
+            if (arg === 'on') want = true;
+            else if (arg === 'off') want = false;
+            else {
+                let cur = false;
+                try {
+                    cur = localStorage.getItem('cgaudino.sfx') === '1';
+                } catch {
+                    /* ignore */
+                }
+                want = !cur;
+            }
+            if (typeof window !== 'undefined') {
+                window.dispatchEvent(new CustomEvent('cgaudino:sfx', { detail: want }));
+            }
+            return {
+                output: (
+                    <Line>
+                        keystroke sound{' '}
+                        <span className={want ? 'text-term-green' : 'text-beige-500'}>{want ? 'on' : 'off'}</span>
+                    </Line>
+                ),
+            };
+        },
+    },
     // ---- easter eggs ----
     {
         name: 'sudo',

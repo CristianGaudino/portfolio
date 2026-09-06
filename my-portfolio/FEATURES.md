@@ -12,6 +12,7 @@ Working log of what's built and what's next. Check things off as they land.
 ### Terminal
 - [x] Interactive shell: `help`, `ls`, `cd`, `cat`, `open`, `tree`, `pwd`, `whoami`, `uptime`, `date`, `echo`, `clear`
 - [x] Async commands supported (loading placeholder → in-place update): `neofetch`, `stats`, `now`, `faves` print live data
+- [x] `sound [on|off]` command + speaker toggle in the title bar — synthesised keystroke clicks, off by default, remembered in localStorage
 - [x] Scrollback text is selectable (visible `::selection`, focus-on-click skips when a selection is active)
 - [x] Easter eggs: `sudo`, `rm`, `exit`, `hello`
 - [x] History (↑/↓), Tab autocomplete, Ctrl+L
@@ -30,6 +31,13 @@ Working log of what's built and what's next. Check things off as they land.
 - [x] Now-playing row via Spotify (`/api/now-playing`, currently-playing → recently-played fallback) — degrades to "—" until env configured; `scripts/spotify-token.mjs` does the one-time refresh-token handshake
 - [x] reading / watching / playing rows via personal tracker (`/api/tracker`) — degrades until env configured
 - [x] `faves` command + data layer: album/film/series/game of the year from the tracker (`year` field), top artist from Spotify (`/api/spotify-top`, `user-top-read` scope)
+- [x] `MEDIA` section — mirrors `faves` on the panel; renders only when data exists
+- [x] `PROCESSES` section — recent GitHub repos as a PID/name/touched table (stable hashed PIDs)
+- [x] `load` gauge — fake load-average from time-of-day + commits today + music state
+- [x] Contribution heatmap (`SITE_CONFIG.heatmapWeeks`) via GraphQL — needs `GITHUB_TOKEN`, hidden otherwise
+- [x] `deploy` row — live Vercel deployment state (`/api/deploy`, needs `VERCEL_TOKEN` + `VERCEL_PROJECT_ID`)
+- [x] `peer` row — visitor city + km from Dublin, from Vercel geo headers (`/api/peer`, works on Vercel only)
+- [x] All dashboard fetches lifted into one `useDashboardData()` hook
 - [x] `config.ts` for non-secret config; `.env.example` for the optional integrations
 
 ### Content & polish
@@ -38,26 +46,14 @@ Working log of what's built and what's next. Check things off as they land.
 - [x] All ad-hoc `text-blue-400` / `text-green-400` / `text-yellow-300` in `definitions.tsx` → `--color-term-*` tokens
 - [x] Fixed `bio.txt` printing the wrong filename
 - [x] `metadata` — description, OpenGraph/Twitter tags, `metadataBase` (`www.cgaudino.com`); dynamic OG image at `src/app/opengraph-image.tsx`
-- [x] Deleted dead `terminal-modal.tsx` + unused types (`FileNode`, `TerminalLine`, `TerminalModalProps`, `TerminalOutputProps`)
+- [x] Deleted dead `terminal-modal.tsx` + unused types; removed the now-unused `framer-motion` dependency
+- [x] Staggered entrance animation on the three panels after boot (respects `prefers-reduced-motion`)
 
 ## Backlog
 
-### Integrations / infra
-- [ ] Populate Vercel env: `GITHUB_TOKEN`, `SPOTIFY_CLIENT_ID`/`SECRET`/`REFRESH_TOKEN` (re-run `spotify-token.mjs` for the new `user-top-read` scope), `TRACKER_STATUS_URL`
+### Waiting on env / external setup
+- [ ] Vercel env: `GITHUB_TOKEN` (also unlocks the heatmap), `SPOTIFY_CLIENT_ID`/`SECRET`/`REFRESH_TOKEN` (re-run `spotify-token.mjs` for the `user-top-read` scope), `TRACKER_STATUS_URL`, `VERCEL_TOKEN` + `VERCEL_PROJECT_ID` (deploy row)
 - [ ] Add a JSON status endpoint to the personal tracker site (`{ reading, watching, playing, year: { album, film, series, game } }`)
-- [ ] Vercel deploy-status row — the site monitoring itself
-- [ ] Peer info from request headers (visitor city + distance from Dublin)
 
-### System monitor
-- [ ] `MEDIA` section in the monitor mirroring `faves` (renders only when data exists)
-- [ ] Composite "system load" gauge (time-of-day + commit activity + now-playing)
-- [ ] Contribution heatmap (last ~12 weeks) as a grid
-- [ ] "processes" table from recent GitHub repos (name, language, last-touched), repo-id as PID
-
-### Terminal
-- [ ] Optional muted keystroke SFX (off by default)
-
-### Content & polish
-- [ ] Entrance / stagger animation on first paint after boot
+### Nice-to-have
 - [ ] True "close" with a dock to reopen (currently red just collapses like amber)
-- [ ] `framer-motion` is now an unused dependency — drop it from `package.json` when doing a lockfile pass

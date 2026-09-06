@@ -119,6 +119,17 @@
     .eq-bar {
         animation: eq 900ms ease-in-out infinite;
     }
+    .enter-a, .enter-b, .enter-c {
+        animation: enter-up 360ms ease-out both;
+    }
+    .enter-a { animation-delay: 60ms; }
+    .enter-b { animation-delay: 150ms; }
+    .enter-c { animation-delay: 240ms; }
+}
+
+@keyframes enter-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: none; }
 }
 
 .eq-bar {
