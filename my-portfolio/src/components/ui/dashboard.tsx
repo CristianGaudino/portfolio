@@ -71,12 +71,6 @@ function systemLoad(status: DevStatus, gh: GithubActivity | undefined, playing: 
     return Math.round(load * 100) / 100;
 }
 
-function pidFor(name: string): number {
-    let h = 0;
-    for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) | 0;
-    return 1000 + (Math.abs(h) % 9000);
-}
-
 export function Dashboard() {
     const data = useDashboardData();
 
@@ -106,7 +100,6 @@ export function Dashboard() {
                 <div className="min-w-0 flex-1 space-y-4">
                     <SystemSection data={data} />
                     <ActivitySection data={data} />
-                    <ProcessSection data={data} />
                     <NowSection data={data} />
                     <MediaSection data={data} />
                 </div>
@@ -292,35 +285,6 @@ function ActivitySection({ data }: { data: DashboardData }) {
                     </button>
                 </span>
             </StatRow>
-        </MonitorSection>
-    );
-}
-
-function ProcessSection({ data }: { data: DashboardData }) {
-    const { data: gh } = data.gh;
-    if (!gh?.repos.length) return null;
-
-    return (
-        <MonitorSection title="processes">
-            <div className="space-y-0.5 text-sm">
-                <div className="flex gap-3 text-[0.7rem] uppercase tracking-wider text-beige-600">
-                    <span className="w-12 shrink-0">pid</span>
-                    <span className="min-w-0 flex-1">name</span>
-                    <span className="w-24 shrink-0">touched</span>
-                </div>
-                {gh.repos.map((r) => (
-                    <div key={r.name} className="flex gap-3 leading-snug">
-                        <span className="w-12 shrink-0 tabular-nums text-purple-500">{pidFor(r.name)}</span>
-                        <span className="min-w-0 flex-1 truncate">
-                            <a href={r.url} target="_blank" rel="noopener noreferrer" className="text-beige-200 hover:underline">
-                                {r.name}
-                            </a>
-                            {r.language && <span className="text-beige-500"> · {r.language}</span>}
-                        </span>
-                        <span className="w-24 shrink-0 text-beige-500">{formatRelative(r.pushedAt)}</span>
-                    </div>
-                ))}
-            </div>
         </MonitorSection>
     );
 }

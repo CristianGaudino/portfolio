@@ -32,7 +32,6 @@ Working log of what's built and what's next. Check things off as they land.
 - [x] reading / watching / playing rows via personal tracker (`/api/tracker`) — degrades until env configured
 - [x] `faves` command + data layer: album/film/series/game of the year from the tracker (`year` field), top artist from Spotify (`/api/spotify-top`, `user-top-read` scope)
 - [x] `MEDIA` section — mirrors `faves` on the panel; renders only when data exists
-- [x] `PROCESSES` section — recent GitHub repos as a PID/name/touched table (stable hashed PIDs)
 - [x] `load` gauge — fake load-average from time-of-day + commits today + music state
 - [x] Contribution heatmap (`SITE_CONFIG.heatmapWeeks`) via GraphQL — needs `GITHUB_TOKEN`, hidden otherwise
 - [x] `deploy` row — live Vercel deployment state (`/api/deploy`, needs `VERCEL_TOKEN` + `VERCEL_PROJECT_ID`)
