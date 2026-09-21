@@ -2,7 +2,7 @@ import React from 'react';
 
 // Types
 
-export type FileType = 'exe' | 'txt' | 'info' | 'pdf';
+export type FileType = 'exe' | 'txt' | 'info' | 'pdf' | 'map';
 
 export interface CommandFile {
     id: string;
@@ -297,6 +297,26 @@ export const COMMANDS: CommandFolder[] = [
                                 </p>
                             ))}
                         </div>
+                    </>
+                )
+            },
+        ]
+    },
+    {
+        id: 'travel',
+        children: [
+            {
+                id: 'atlas.map',
+                type: 'map',
+                message: (
+                    <>
+                        <OpenLine name="atlas.map" />
+                        <Prose>
+                            <p>
+                                A map of where I&apos;ve been. Click <span className="text-purple-300">atlas.map</span> in the
+                                sidebar to open it, or run <span className="text-term-green">travel</span> for a text summary.
+                            </p>
+                        </Prose>
                     </>
                 )
             },

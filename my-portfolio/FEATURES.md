@@ -48,6 +48,17 @@ Working log of what's built and what's next. Check things off as they land.
 - [x] Deleted dead `terminal-modal.tsx` + unused types; removed the now-unused `framer-motion` dependency
 - [x] Staggered entrance animation on the three panels after boot (respects `prefers-reduced-motion`)
 
+### Travel atlas
+- [x] `travel/atlas.map` in the file explorer — clicking (or Enter) opens a floating `AtlasWindow` panel with a world map, matching the other windows' chrome
+- [x] Static SVG world map (235 countries, 50m resolution — 110m drops small countries like Malta/Singapore entirely) generated once from `world-atlas` TopoJSON + `topojson-client` + `iso-3166-1` via `scripts/build-world-map.mjs`. Split into `world-map-paths.json` (paths, ~1.1MB, lazy-loaded only when the atlas opens via `next/dynamic`) and `world-map-geo.json` (centroid lon/lat, ~8KB, always bundled for the `furthest` stat) — no runtime map deps ship to the client
+- [x] `src/lib/travel.ts` — simple `TRAVEL` data file (country, code, visits[], home?, favorite?) + `getTravelStats()`/`describeCountry()`. **Real data filled in** — 21 countries / 53 cities from the user's actual trip list
+- [x] Visited countries render in purple (brighter for home / repeat trips), unvisited near-black with thin muted borders
+- [x] Hover/click a country → terminal-style status line (`> Spain · 2026 · Mallorca (+3 more trips)`) + legend (`countries: 21 · cities: 53`)
+- [x] `travel` terminal command — countries, cities, newest trip (excludes home), top destination (most trips), furthest (haversine from `SITE_CONFIG.hostGeo`), bucket list
+- [x] Bucket list — `BUCKET_LIST` in `travel.ts` (Japan, Switzerland, China, New Zealand); a toggle button on the map ("bucket list (4)") shows them in green when not already visited; hover/click tooltip says "Country · bucket list" while the toggle is on
+- [x] Map bug-fix round: duplicate `AU` React key (Natural Earth splits some countries — Australia + "Ashmore and Cartier Is." — across multiple features sharing one ISO code; generator now merges by resolved alpha-2 before emitting), map lag (raw 50m topology was ~100k points + hover was driving a full-list React re-render on every `mouseenter`; fixed with `topojson-simplify` down to ~11k points and switching hover to pure CSS `hover:brightness-150`), horizontal lines across the map (Russia/Fiji cross the antimeridian — their rings jumped from lon≈180 to lon≈-180, drawing a straight line across the whole canvas; generator now splits a ring wherever a step exceeds a real border segment), France showing overseas territories (Natural Earth bundles French Guiana/Réunion/Martinique/Guadeloupe into one MultiPolygon; a new `MAINLAND_ONLY` bbox allowlist drops rings outside metropolitan France), map "scale" (switched the projection from equirectangular to Gall-Peters cylindrical equal-area, so relative country *area* is geographically correct), Malta/Singapore rendering as invisible degenerate points (the simplification pass over-simplified very small countries to zero-area shapes; the generator now falls back to unsimplified geometry for any country whose simplified bbox is too small)
+- [x] Click-to-zoom — click a country to zoom the map to its bounding box (via `getBBox()`, with padding and a size floor so tiny countries keep geographic context); click again or "‹ world" to zoom back out; zoomed country shows its real visited cities as chips below the map
+
 ## Backlog
 
 ### Waiting on env / external setup

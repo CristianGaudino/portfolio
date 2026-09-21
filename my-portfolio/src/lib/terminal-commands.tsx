@@ -4,6 +4,7 @@ import { SITE_CONFIG } from './config';
 import { formatRelative, getUptimeReadout, getDevStatus, getLocalTime, getVersion } from './utils';
 import type { GithubActivity } from './github';
 import type { NowPlaying, SpotifyTop, TrackerStatus } from './status';
+import { BUCKET_LIST, getTravelStats } from './travel';
 import { Bars, MeterList } from '@/components/ui/monitor';
 
 export type CommandResult = {
@@ -33,7 +34,7 @@ async function getJson<T>(url: string): Promise<T | null> {
 function Kv({ k, children }: { k: string; children: React.ReactNode }) {
     return (
         <div className="flex gap-2">
-            <span className="w-16 shrink-0 text-purple-300">{k}</span>
+            <span className="w-20 shrink-0 text-purple-300">{k}</span>
             <span className="min-w-0 text-beige-200">{children}</span>
         </div>
     );
@@ -52,6 +53,7 @@ const TYPE_COLOR: Record<FileType, string> = {
     info: 'text-term-amber',
     exe: 'text-term-green',
     pdf: 'text-term-red',
+    map: 'text-purple-300',
 };
 
 /** Resolve a path argument against the current working directory. */
@@ -420,6 +422,44 @@ const COMMAND_LIST: CommandSpec[] = [
                     <div className="space-y-0.5">
                         <Line><span className="text-purple-300">cristiano&apos;s past year in media</span></Line>
                         {rows}
+                    </div>
+                ),
+            };
+        },
+    },
+    {
+        name: 'travel',
+        summary: 'countries visited — atlas summary',
+        run: () => {
+            const s = getTravelStats();
+            return {
+                output: (
+                    <div className="space-y-0.5">
+                        <Line><span className="text-purple-300">atlas.map</span></Line>
+                        <Kv k="countries">{s.countries}</Kv>
+                        <Kv k="cities">{s.cities}</Kv>
+                        {s.newest && (
+                            <Kv k="newest">
+                                {s.newest.country} <span className="text-beige-500">· {s.newest.year}</span>
+                            </Kv>
+                        )}
+                        {s.top && (
+                            <Kv k="top">
+                                {s.top.country}{' '}
+                                <span className="text-beige-500">
+                                    · {s.top.visits} trip{s.top.visits > 1 ? 's' : ''}
+                                </span>
+                            </Kv>
+                        )}
+                        {s.furthest && (
+                            <Kv k="furthest">
+                                {s.furthest.country} <span className="text-beige-500">· ~{s.furthest.km.toLocaleString()} km</span>
+                            </Kv>
+                        )}
+                        <Kv k="bucket">
+                            <span className="text-term-green">{BUCKET_LIST.map((b) => b.country).join(', ')}</span>
+                        </Kv>
+                        <Line><span className="text-beige-500">click travel/atlas.map in the sidebar to see the map</span></Line>
                     </div>
                 ),
             };

@@ -1,14 +1,23 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { Dashboard } from '@/components/ui/dashboard';
 import { FaGithub, FaLinkedin } from 'react-icons/fa6';
 import TerminalOutput from '@/components/ui/terminal-output';
 import { COMMANDS, TerminalOutputHandle } from '@/lib/definitions';
 import { shareTechMono } from '@/components/ui/fonts';
-import { BsFileEarmarkCode, BsFileEarmarkPdf, BsFileEarmarkPerson, BsFileEarmarkText } from 'react-icons/bs';
+import { BsFileEarmarkCode, BsFileEarmarkPdf, BsFileEarmarkPerson, BsFileEarmarkText, BsMap } from 'react-icons/bs';
 import { Window } from '@/components/ui/window';
 import { BootScreen } from '@/components/ui/boot-screen';
+import { AtlasWindow } from '@/components/ui/atlas-window';
+
+// The world map's path data is sizeable — split out of the main bundle,
+// fetched only when the atlas is actually opened.
+const WorldMap = dynamic(() => import('@/components/ui/world-map').then((m) => m.WorldMap), {
+    ssr: false,
+    loading: () => <div className="grid h-full place-items-center text-sm text-beige-500">loading atlas…</div>,
+});
 
 type VisibleItem =
     | { id: string; type: 'folder' }
@@ -23,6 +32,7 @@ export default function Home() {
     const [filesCollapsed, setFilesCollapsed] = useState(false);
     const [monitorCollapsed, setMonitorCollapsed] = useState(false);
     const [termCollapsed, setTermCollapsed] = useState(false);
+    const [atlasOpen, setAtlasOpen] = useState(false);
     const topAllCollapsed = filesCollapsed && monitorCollapsed;
 
     const handleBooted = useCallback(() => setBooted(true), []);
@@ -46,6 +56,7 @@ export default function Home() {
     };
 
     const runChild = (folderId: string, childId: string, type: string) => {
+        if (type === 'map') setAtlasOpen(true);
         const verb = type === 'exe' ? 'open' : 'cat';
         termRef.current?.run(`${verb} ${folderId}/${childId}`);
     };
@@ -101,6 +112,10 @@ export default function Home() {
             <div className="crt-vignette" aria-hidden />
 
             {!booted && <BootScreen onDone={handleBooted} />}
+
+            <AtlasWindow title="atlas.map — world" open={atlasOpen} onClose={() => setAtlasOpen(false)}>
+                <WorldMap />
+            </AtlasWindow>
 
             <div className={`flex h-full flex-col ${booted ? 'crt-power-on' : 'invisible'}`}>
                 {/* Files / dashboard toggle — shown until there's room for both side by side */}
@@ -165,6 +180,7 @@ export default function Home() {
                                                         {child.type === 'info' && <BsFileEarmarkPerson className="shrink-0 text-term-amber" />}
                                                         {child.type === 'exe' && <BsFileEarmarkCode className="shrink-0 text-term-green" />}
                                                         {child.type === 'pdf' && <BsFileEarmarkPdf className="shrink-0 text-term-red" />}
+                                                        {child.type === 'map' && <BsMap className="shrink-0 text-purple-300" />}
                                                         {child.id}
                                                     </button>
                                                 ))}
