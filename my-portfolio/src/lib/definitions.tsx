@@ -334,28 +334,4 @@ export function findFile(folder: string, file: string): CommandFile | null {
     return findFolder(folder)?.children.find((ch) => ch.id === file) ?? null;
 }
 
-export const SKILLS = [
-    "Next.js",
-    "TypeScript",
-    "React",
-    "Tailwind CSS",
-    "Node.js",
-    "PostgreSQL",
-    "Jest",
-    "Python",
-    "PL/SQL",
-    "PHP",
-    "MySQL",
-    "JavaScript",
-    "HTML",
-    "CSS",
-    "Bootstrap 5",
-    "Laminas PHP",
-    "JQuery",
-    "Oracle",
-    "Vercel",
-    "Git",
-    "Agile Development",
-    "AI Development",
-];
 

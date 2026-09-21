@@ -237,7 +237,7 @@ const COMMAND_LIST: CommandSpec[] = [
     },
     {
         name: 'uptime',
-        summary: 'time since the first commit',
+        summary: 'time since 26 mar 1999',
         run: () => ({
             output: (
                 <Line>

@@ -11,6 +11,7 @@ import { BsFileEarmarkCode, BsFileEarmarkPdf, BsFileEarmarkPerson, BsFileEarmark
 import { Window } from '@/components/ui/window';
 import { BootScreen } from '@/components/ui/boot-screen';
 import { AtlasWindow } from '@/components/ui/atlas-window';
+import { SITE_CONFIG } from '@/lib/config';
 
 // The world map's path data is sizeable — split out of the main bundle,
 // fetched only when the atlas is actually opened.
@@ -218,12 +219,12 @@ export default function Home() {
                 <footer className="shrink-0 flex w-full flex-row items-center justify-between border-t border-beige-700 bg-beige-900 px-8 py-3 text-beige-400">
                     <span className="text-purple-300 glow-soft">cgaudino.os</span>
                     <div className="flex items-center gap-4">
-                        <a href="https://github.com/CristianGaudino" className="flex items-center underline transition-colors hover:text-beige-100" target="_blank" rel="noopener noreferrer">
+                        <a href={SITE_CONFIG.github.profileUrl} className="flex items-center underline transition-colors hover:text-beige-100" target="_blank" rel="noopener noreferrer">
                             <FaGithub className="mr-2 text-white" />
                             GitHub
                         </a>
                         <span className="text-beige-600">|</span>
-                        <a href="https://www.linkedin.com/in/cristiano-gaudino" className="flex items-center underline transition-colors hover:text-beige-100" target="_blank" rel="noopener noreferrer">
+                        <a href={SITE_CONFIG.linkedinUrl} className="flex items-center underline transition-colors hover:text-beige-100" target="_blank" rel="noopener noreferrer">
                             <FaLinkedin className="mr-2 text-term-blue" />
                             LinkedIn
                         </a>

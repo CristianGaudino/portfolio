@@ -11,6 +11,7 @@ export const SITE_CONFIG = {
         profileUrl: 'https://github.com/CristianGaudino',
         repoUrl: 'https://github.com/CristianGaudino/portfolio',
     },
+    linkedinUrl: 'https://www.linkedin.com/in/cristiano-gaudino',
 
     /** Shell identity — `user@host` in the prompt, neofetch, boot, etc. */
     shell: { user: 'root', host: 'cgaudino' },
