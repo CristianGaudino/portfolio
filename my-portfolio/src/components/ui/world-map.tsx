@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import worldMap from '@/lib/world-map-paths.json';
-import { BUCKET_LIST, TRAVEL, describeCountry, getTravelStats, type TravelCountry } from '@/lib/travel';
+import { BUCKET_LIST, TRAVEL, describeCountry, describeLatestVisit, getTravelStats, type TravelCountry } from '@/lib/travel';
 
 const PAD_FRACTION = 0.35; // breathing room around a zoomed country, relative to its own size
 const MIN_ZOOM_SIZE = 60; // don't zoom in tighter than this many viewBox units — keeps tiny countries oriented
@@ -25,9 +25,11 @@ export function WorldMap() {
     const bucketByCode = useMemo(() => new Map(BUCKET_LIST.map((b) => [b.code, b] as const)), []);
     const stats = useMemo(() => getTravelStats(), []);
 
-    const describe = (code: string, name: string) => {
+    // Hovering only ever previews the latest trip; the full history (+ every city across all
+    // visits) only reveals once the country is actually clicked/zoomed.
+    const describe = (code: string, name: string, detailed: boolean) => {
         const travel = byCode.get(code);
-        if (travel) return describeCountry(travel);
+        if (travel) return detailed ? describeCountry(travel) : describeLatestVisit(travel);
         const bucket = bucketByCode.get(code);
         if (showBucket && bucket) return `${bucket.country} · bucket list`;
         return name.toUpperCase();
@@ -37,9 +39,13 @@ export function WorldMap() {
     // (avoids the line flicking to a neighbouring country that's merely visible in the zoomed frame).
     const activeCode = zoomBox ? selected : hovered;
     const activeGeo = activeCode ? worldMap.countries.find((c) => c.code === activeCode) : undefined;
-    const line = activeGeo ? describe(activeGeo.code, activeGeo.name) : 'click a country to zoom in';
+    const line = activeGeo ? describe(activeGeo.code, activeGeo.name, !!zoomBox) : 'click a country to zoom in';
     const activeTravel = activeCode ? byCode.get(activeCode) : undefined;
-    const cities = activeTravel ? [...new Set(activeTravel.visits.flatMap((v) => v.cities))] : [];
+    const cities = activeTravel
+        ? zoomBox
+            ? [...new Set(activeTravel.visits.flatMap((v) => v.cities))] // clicked: every city, all visits
+            : [...activeTravel.visits].sort((a, b) => b.year - a.year)[0].cities // hovered: latest trip only
+        : [];
 
     const zoomOut = () => {
         setSelected(null);
@@ -87,7 +93,7 @@ export function WorldMap() {
                                 onMouseEnter={() => !zoomBox && setHovered(c.code)}
                                 onMouseLeave={() => !zoomBox && setHovered(null)}
                             >
-                                <title>{describe(c.code, c.name)}</title>
+                                <title>{describe(c.code, c.name, false)}</title>
                             </path>
                         );
                     })}

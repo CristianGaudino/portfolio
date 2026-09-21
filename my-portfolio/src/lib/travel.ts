@@ -166,11 +166,23 @@ export const TRAVEL: TravelCountry[] = [
 ];
 
 /** `JAPAN · 2024 · Kyoto / Tokyo`, or `IRELAND · home base`. */
+function latestVisit(entry: TravelCountry): TravelVisit {
+    return [...entry.visits].sort((a, b) => b.year - a.year)[0];
+}
+
+/** Full history — used once a country is clicked/zoomed. Includes the "+N more trips" hint. */
 export function describeCountry(entry: TravelCountry): string {
     if (entry.home) return `${entry.country} · home base`;
-    const latest = [...entry.visits].sort((a, b) => b.year - a.year)[0];
+    const latest = latestVisit(entry);
     const more = entry.visits.length > 1 ? ` (+${entry.visits.length - 1} more trip${entry.visits.length > 2 ? 's' : ''})` : '';
     return `${entry.country} · ${latest.year} · ${latest.cities.join(' / ')}${more}`;
+}
+
+/** Latest trip only, no hint that other trips exist — used for the hover-only preview. */
+export function describeLatestVisit(entry: TravelCountry): string {
+    if (entry.home) return `${entry.country} · home base`;
+    const latest = latestVisit(entry);
+    return `${entry.country} · ${latest.year} · ${latest.cities.join(' / ')}`;
 }
 
 function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
