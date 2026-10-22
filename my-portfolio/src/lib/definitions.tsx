@@ -102,7 +102,7 @@ export const COMMANDS: CommandFolder[] = [
                 message: (
                     <>
                         Reach out via email:{' '}
-                        <ExtLink href="mailto:gaudino.cristian@gmail.com">gaudino.cristian@gmail.com</ExtLink>
+                        <ExtLink href="mailto:contact@cgaudino.com">contact@cgaudino.com</ExtLink>
                     </>
                 )
             },
