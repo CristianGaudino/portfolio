@@ -82,7 +82,7 @@ export function Window({
             <div
                 onClick={onClick}
                 className={[
-                    'flex flex-col overflow-hidden rounded-lg border border-beige-600/70 bg-beige-800/90 backdrop-blur-sm window-shadow',
+                    'flex flex-col overflow-hidden rounded-lg border border-beige-600/70 bg-beige-800/90 window-shadow',
                     maximized ? 'fixed inset-3 z-[45] sm:inset-6' : className,
                     collapsed && !maximized ? 'self-start !h-auto' : '',
                 ].join(' ')}

@@ -33,7 +33,8 @@ export function useJson<T>(url: string, pollMs?: number): AsyncState<T> {
             alive = false;
         };
 
-        const timer = setInterval(load, pollMs);
+        // no point refreshing widgets nobody is looking at
+        const timer = setInterval(() => !document.hidden && load(), pollMs);
         return () => {
             alive = false;
             clearInterval(timer);

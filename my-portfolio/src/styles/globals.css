@@ -106,9 +106,6 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-    .crt-overlay {
-        animation: crt-flicker 4.5s steps(1) infinite;
-    }
     .crt-power-on {
         animation: crt-power-on 620ms ease-out;
         transform-origin: center;
@@ -133,22 +130,15 @@
 }
 
 .eq-bar {
-    height: 40%;
+    height: 100%;
+    transform: scaleY(0.4);
+    transform-origin: bottom;
 }
 
+/* transform, not height — keeps the bars off the layout path */
 @keyframes eq {
-    0%, 100% { height: 20%; }
-    50%      { height: 100%; }
-}
-
-@keyframes crt-flicker {
-    0%, 100%   { opacity: 1; }
-    47%        { opacity: 0.96; }
-    48%        { opacity: 1; }
-    49%        { opacity: 0.98; }
-    72%        { opacity: 1; }
-    73%        { opacity: 0.94; }
-    74%        { opacity: 1; }
+    0%, 100% { transform: scaleY(0.2); }
+    50%      { transform: scaleY(1); }
 }
 
 @keyframes crt-power-on {
