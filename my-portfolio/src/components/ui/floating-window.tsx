@@ -28,7 +28,7 @@ export function FloatingWindow({ title, open, onClose, children }: FloatingWindo
     return (
         <>
             <div className="fixed inset-0 z-40 bg-black/60" onClick={onClose} aria-hidden />
-            <div className="fixed inset-3 z-[45] flex flex-col overflow-hidden rounded-lg border border-beige-600/70 bg-beige-800/90 backdrop-blur-sm window-shadow sm:inset-6">
+            <div className="fixed inset-3 z-[45] flex flex-col overflow-hidden rounded-lg border border-beige-600/70 bg-beige-800/90 window-shadow sm:inset-6">
                 <div className="flex shrink-0 items-center gap-3 border-b border-beige-700 bg-beige-900/60 px-3 py-2 select-none">
                     <span className="flex gap-1.5">
                         <button
