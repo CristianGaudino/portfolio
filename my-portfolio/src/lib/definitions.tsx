@@ -1,4 +1,5 @@
 import React from 'react';
+import { PROJECTS, hostDomain, projectFile, type Project } from './projects';
 
 // Types
 
@@ -65,9 +66,37 @@ const Role = ({ dates, title, org }: { dates: string; title: string; org: string
     </>
 );
 
+/** Terminal readout for one project — the showcase window has the full version. */
+const ProjectCard = ({ p }: { p: Project }) => (
+    <>
+        <span>
+            <span className="text-purple-300">{p.name}</span> <RunLink href={p.url} />
+            {p.featured && <span className="text-term-green"> new</span>}
+        </span>
+        <Prose>
+            <p>{p.tagline} {p.about}</p>
+        </Prose>
+        <div className="mt-1 max-w-[70ch] space-y-0.5 leading-relaxed">
+            <p><span className="inline-block w-24 text-term-blue">built with</span>{p.stack.join(', ')}</p>
+            <p><span className="inline-block w-24 text-term-blue">hosted on</span>{p.host} ({hostDomain(p.url)})</p>
+            <p><span className="inline-block w-24 text-term-blue">try it</span>{p.tryIt}</p>
+            {p.repo && <p><span className="inline-block w-24 text-term-blue">source</span><ExtLink href={p.repo}>{p.repo.replace('https://', '')}</ExtLink></p>}
+        </div>
+    </>
+);
+
 // Const
 
 export const COMMANDS: CommandFolder[] = [
+    {
+        id: 'projects',
+        children: PROJECTS.map((p) => ({
+            id: projectFile(p),
+            type: 'exe' as const,
+            href: p.url,
+            message: <ProjectCard p={p} />,
+        })),
+    },
     {
         id: 'about',
         children: [
@@ -203,62 +232,6 @@ export const COMMANDS: CommandFolder[] = [
         ]
     },
     {
-        id: 'projects',
-        children: [
-            {
-                id: 'antisocial.exe',
-                type: 'exe',
-                href: 'https://www.antisocial.cgaudino.com',
-                message: (
-                    <>
-                        <span>anti-social <RunLink href="https://www.antisocial.cgaudino.com" /></span>
-                        <Prose>
-                            <p>
-                                Anti-social is an anti-social media platform designed to provide users with a non-addictive,
-                                scrollable feed based on expressed interests across different forms of media.
-                            </p>
-                            <p className="text-purple-500">
-                                This platform is still in development; however, a working prototype is available.
-                            </p>
-                        </Prose>
-                    </>
-                )
-            },
-            {
-                id: 'topdown.ts',
-                type: 'exe',
-                href: 'https://www.topdown.cgaudino.com',
-                message: (
-                    <>
-                        <span>topdown.ts <RunLink href="https://www.topdown.cgaudino.com" /></span>
-                        <Prose>
-                            <p>
-                                A browser-based top-down game built with HTML5 canvas, featuring dynamic enemy AI and
-                                procedurally generated levels.
-                            </p>
-                        </Prose>
-                    </>
-                )
-            },
-            {
-                id: 'train_of_thought.exe',
-                type: 'exe',
-                href: 'https://www.trainofthought.cgaudino.com',
-                message: (
-                    <>
-                        <span>Train of Thought <RunLink href="https://www.trainofthought.cgaudino.com" /></span>
-                        <Prose>
-                            <p>
-                                Train of Thought is an experimental idea-visualization engine, designed to map and connect
-                                concepts in real-time.
-                            </p>
-                        </Prose>
-                    </>
-                )
-            },
-        ]
-    },
-    {
         id: 'skills',
         children: [
             {
@@ -287,9 +260,10 @@ export const COMMANDS: CommandFolder[] = [
                             {[
                                 ['Languages', 'TypeScript, JavaScript, PHP, PL/SQL, SQL, Python, HTML, CSS'],
                                 ['Frontend', 'Next.js, React, Tailwind CSS, Bootstrap 5, JQuery'],
-                                ['Backend', 'Node.js, PostgreSQL, Oracle, Laminas PHP'],
-                                ['Tools', 'Git, Vercel, Neon'],
-                                ['Other', 'Agile Development, AI Development'],
+                                ['Backend', 'Node.js, Hono, PostgreSQL, Drizzle, Oracle, Laminas PHP'],
+                                ['Hosting', 'Cloudflare Workers, D1, R2, Vercel, Neon'],
+                                ['Tools', 'Git, GitHub Actions, Clerk, Vitest, Playwright'],
+                                ['Other', 'Agile Development, AI Development (Claude API, AI SDK)'],
                             ].map(([label, items]) => (
                                 <p key={label}>
                                     <span className="inline-block w-28 text-term-blue">{label}:</span>

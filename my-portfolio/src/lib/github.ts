@@ -16,7 +16,6 @@ export type GithubActivity = {
     commitsPerDay: number[];
     commitTotal: number;
     languages: { name: string; pct: number }[];
-    repos: { name: string; language: string | null; pushedAt: string; url: string }[];
     /** contribution calendar for the last SITE_CONFIG.heatmapWeeks weeks — needs GITHUB_TOKEN */
     contributions: { days: HeatCell[]; total: number } | null;
     generatedAt: string;
@@ -25,13 +24,12 @@ export type GithubActivity = {
 
 const DAYS = SITE_CONFIG.activityDays;
 
-function emptyActivity(degraded: boolean): GithubActivity {
+export function emptyActivity(degraded: boolean): GithubActivity {
     return {
         lastPush: null,
         commitsPerDay: Array<number>(DAYS).fill(0),
         commitTotal: 0,
         languages: [],
-        repos: [],
         contributions: null,
         generatedAt: new Date().toISOString(),
         degraded,
@@ -46,11 +44,8 @@ type PushEvent = {
 };
 
 type Repo = {
-    name: string;
-    html_url: string;
     fork: boolean;
     language: string | null;
-    pushed_at: string;
 };
 
 const LEVEL: Record<string, 0 | 1 | 2 | 3 | 4> = {
@@ -171,13 +166,6 @@ function buildActivity(
         .sort((a, b) => b[1] - a[1])
         .slice(0, 5)
         .map(([name, count]) => ({ name, pct: Math.round((count / langTotal) * 100) }));
-
-    result.repos = active.slice(0, 6).map((r) => ({
-        name: r.name,
-        language: r.language,
-        pushedAt: r.pushed_at,
-        url: r.html_url,
-    }));
 
     return result;
 }

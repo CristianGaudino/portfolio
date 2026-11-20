@@ -5,6 +5,7 @@ import { formatRelative, getUptimeReadout, getDevStatus, getLocalTime, getVersio
 import type { GithubActivity } from './github';
 import type { NowPlaying, SpotifyTop, TrackerStatus } from './status';
 import { BUCKET_LIST, getTravelStats } from './travel';
+import { OPEN_PROJECTS_EVENT, PROJECTS } from './projects';
 import { Bars, MeterList } from '@/components/ui/monitor';
 
 export type CommandResult = {
@@ -20,6 +21,10 @@ type CommandSpec = {
     run: (args: string[], ctx: { cwd: string[]; raw: string }) => CommandResult | Promise<CommandResult>;
     hidden?: boolean;
 };
+
+function openShowcase(slug: string) {
+    if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent(OPEN_PROJECTS_EVENT, { detail: slug }));
+}
 
 async function getJson<T>(url: string): Promise<T | null> {
     try {
@@ -177,6 +182,7 @@ const COMMAND_LIST: CommandSpec[] = [
             if (kind === 'none') return err(`open: ${args[0]}: no such file or directory`);
             if (kind === 'root' || kind === 'dir') return { cwd: path };
             const file = findFile(path[0], path[1])!;
+            if (path[0] === 'projects') openShowcase(path[1].replace(/\.app$/, ''));
             return {
                 output: (
                     <>
@@ -190,6 +196,31 @@ const COMMAND_LIST: CommandSpec[] = [
                             </Line>
                         )}
                     </>
+                ),
+            };
+        },
+    },
+    {
+        name: 'projects',
+        summary: 'open the project showcase',
+        run: () => {
+            openShowcase('');
+            return {
+                output: (
+                    <div className="space-y-0.5">
+                        {PROJECTS.map((p) => (
+                            <div key={p.slug} className="flex gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => openShowcase(p.slug)}
+                                    className={`w-40 shrink-0 text-left underline-offset-2 hover:underline ${p.featured ? 'text-term-green' : 'text-purple-300'}`}
+                                >
+                                    {p.name}
+                                </button>
+                                <span className="min-w-0 text-beige-400">{p.tagline}</span>
+                            </div>
+                        ))}
+                    </div>
                 ),
             };
         },

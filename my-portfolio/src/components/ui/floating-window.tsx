@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 
-type AtlasWindowProps = {
+type FloatingWindowProps = {
     title: string;
     open: boolean;
     onClose: () => void;
@@ -10,11 +10,10 @@ type AtlasWindowProps = {
 };
 
 /**
- * One-off floating panel for the travel atlas — visually matches `Window`'s
- * maximised overlay, but is externally controlled (open/close only, no
- * collapse) since only one of these ever exists at a time.
+ * Floating panel (travel atlas, project showcase) — visually matches `Window`'s
+ * maximised overlay, but is externally controlled (open/close only, no collapse).
  */
-export function AtlasWindow({ title, open, onClose, children }: AtlasWindowProps) {
+export function FloatingWindow({ title, open, onClose, children }: FloatingWindowProps) {
     useEffect(() => {
         if (!open) return;
         const onKey = (e: KeyboardEvent) => {
@@ -46,7 +45,7 @@ export function AtlasWindow({ title, open, onClose, children }: AtlasWindowProps
                     <button
                         type="button"
                         onClick={onClose}
-                        aria-label="Close atlas"
+                        aria-label={`Close ${title}`}
                         className="ml-auto text-[0.7rem] text-beige-500 transition-colors hover:text-beige-300"
                     >
                         esc ✕

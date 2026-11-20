@@ -134,7 +134,7 @@ function SystemSection({ data }: { data: DashboardData }) {
                 >
                     {BUILD.ref}@{BUILD.sha}
                 </a>
-                {BUILD.time && <span className="text-beige-500"> · built {formatRelative(BUILD.time)}</span>}
+                {BUILD.time && <span suppressHydrationWarning className="text-beige-500"> · built {formatRelative(BUILD.time)}</span>}
             </StatRow>
             {d?.configured && d.state && (
                 <StatRow label="deploy">
