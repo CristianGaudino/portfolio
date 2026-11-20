@@ -10,7 +10,9 @@ import { shareTechMono } from '@/components/ui/fonts';
 import { BsFileEarmarkCode, BsFileEarmarkPdf, BsFileEarmarkPerson, BsFileEarmarkText, BsMap } from 'react-icons/bs';
 import { Window } from '@/components/ui/window';
 import { BootScreen } from '@/components/ui/boot-screen';
-import { AtlasWindow } from '@/components/ui/atlas-window';
+import { FloatingWindow } from '@/components/ui/floating-window';
+import { ProjectsShowcase } from '@/components/ui/projects-showcase';
+import { OPEN_PROJECTS_EVENT, PROJECTS, findProject } from '@/lib/projects';
 import { SITE_CONFIG } from '@/lib/config';
 
 // The world map's path data is sizeable — split out of the main bundle,
@@ -27,16 +29,24 @@ type VisibleItem =
 export default function Home() {
     const termRef = useRef<TerminalOutputHandle>(null);
     const [booted, setBooted] = useState(false);
-    const [expandedCommand, setExpandedCommand] = useState<string | null>(null);
+    const [expandedCommand, setExpandedCommand] = useState<string | null>('projects');
     const [xsView, setXsView] = useState<'files' | 'dashboard'>('files');
     const [focusedId, setFocusedId] = useState<string | null>(null);
     const [filesCollapsed, setFilesCollapsed] = useState(false);
     const [monitorCollapsed, setMonitorCollapsed] = useState(false);
     const [termCollapsed, setTermCollapsed] = useState(false);
     const [atlasOpen, setAtlasOpen] = useState(false);
+    /** null = closed; otherwise the project slug to scroll to ('' for the top) */
+    const [showcase, setShowcase] = useState<string | null>(null);
     const topAllCollapsed = filesCollapsed && monitorCollapsed;
 
     const handleBooted = useCallback(() => setBooted(true), []);
+
+    useEffect(() => {
+        const onOpen = (e: Event) => setShowcase((e as CustomEvent<string>).detail ?? '');
+        window.addEventListener(OPEN_PROJECTS_EVENT, onOpen);
+        return () => window.removeEventListener(OPEN_PROJECTS_EVENT, onOpen);
+    }, []);
 
     useEffect(() => {
         if (!booted) return;
@@ -44,6 +54,22 @@ export default function Home() {
             <>
                 <span className="text-purple-300 glow-soft">cgaudino.os</span>{' '}
                 <span className="text-term-green">online</span>
+                <div className="text-beige-400">
+                    new:{' '}
+                    {PROJECTS.filter((p) => p.featured).map((p, i) => (
+                        <span key={p.slug}>
+                            {i > 0 && ', '}
+                            <button
+                                type="button"
+                                onClick={() => setShowcase(p.slug)}
+                                className="text-term-green underline underline-offset-2 hover:opacity-80"
+                            >
+                                {p.name}
+                            </button>
+                        </span>
+                    ))}
+                    . run <span className="text-purple-300">projects</span> to see everything I&apos;ve built.
+                </div>
                 <div className="text-beige-400">
                     type <span className="text-purple-300">help</span> to list commands, or click a folder to browse.
                 </div>
@@ -114,9 +140,13 @@ export default function Home() {
 
             {!booted && <BootScreen onDone={handleBooted} />}
 
-            <AtlasWindow title="atlas.map — world" open={atlasOpen} onClose={() => setAtlasOpen(false)}>
+            <FloatingWindow title="atlas.map — world" open={atlasOpen} onClose={() => setAtlasOpen(false)}>
                 <WorldMap />
-            </AtlasWindow>
+            </FloatingWindow>
+
+            <FloatingWindow title="projects — what I've built" open={showcase !== null} onClose={() => setShowcase(null)}>
+                <ProjectsShowcase focus={showcase} />
+            </FloatingWindow>
 
             <div className={`flex h-full flex-col ${booted ? 'crt-power-on' : 'invisible'}`}>
                 {/* Files / dashboard toggle — shown until there's room for both side by side */}
@@ -183,6 +213,9 @@ export default function Home() {
                                                         {child.type === 'pdf' && <BsFileEarmarkPdf className="shrink-0 text-term-red" />}
                                                         {child.type === 'map' && <BsMap className="shrink-0 text-purple-300" />}
                                                         {child.id}
+                                                        {cmd.id === 'projects' && findProject(child.id.replace(/\.app$/, ''))?.featured && (
+                                                            <span className="ml-auto text-xs text-term-green">new</span>
+                                                        )}
                                                     </button>
                                                 ))}
                                             </div>

@@ -1,28 +1,14 @@
 import { NextResponse } from 'next/server';
-import { fetchGithubActivity, type GithubActivity } from '@/lib/github';
-import { SITE_CONFIG } from '@/lib/config';
+import { emptyActivity, fetchGithubActivity, type GithubActivity } from '@/lib/github';
 
 export const revalidate = 3600;
-
-function fallback(): GithubActivity {
-    return {
-        lastPush: null,
-        commitsPerDay: Array<number>(SITE_CONFIG.activityDays).fill(0),
-        commitTotal: 0,
-        languages: [],
-        repos: [],
-        contributions: null,
-        generatedAt: new Date().toISOString(),
-        degraded: true,
-    };
-}
 
 export async function GET() {
     let data: GithubActivity;
     try {
         data = await fetchGithubActivity();
     } catch {
-        data = fallback();
+        data = emptyActivity(true);
     }
 
     // Don't cache a degraded response for a full hour — let it recover on the next hit.

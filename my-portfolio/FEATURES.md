@@ -4,6 +4,14 @@ Working log of what's built and what's next. Check things off as they land.
 
 ## Done
 
+### Projects showcase (Nov 2026)
+- [x] `src/lib/projects.ts` — single source for every project: pitch, stack, host, live URL, public source link, how to try it. `featured` = How Many?, How Much?, Checkwork Motors; the rest show smaller
+- [x] `projects/` is the first folder in the tree, open on load, featured files tagged `new`
+- [x] Showcase window (`projects-showcase.tsx` in the shared `FloatingWindow`): featured projects get a big screenshot + built with / hosted on / try it; others in a compact "Also built" grid. Opening a project file scrolls to and outlines it
+- [x] `projects` terminal command, and `open projects/<x>.app` opens the showcase; welcome message links the three featured projects
+- [x] Screenshots of each live site in `public/projects/` (taken with Playwright at 1280×800 — retake when a site's landing page changes)
+- [x] Hidden on purpose: Blacktail, PrepMe, Van Build Planner, Twin Star, Carright (real dealer data), Reptide (no web build), Lighthouse (internal)
+
 ### Boot & atmosphere
 - [x] Typed boot sequence: progress bar, CRT power-on, skip on any key/tap, plays on every load (no persistent skip); static hold under reduced-motion
 - [x] CRT overlay — scanlines, vignette, flicker, accent text-glow (all respect `prefers-reduced-motion`)
@@ -60,6 +68,8 @@ Working log of what's built and what's next. Check things off as they land.
 - [x] Click-to-zoom — click a country to zoom the map to its bounding box (via `getBBox()`, with padding and a size floor so tiny countries keep geographic context); click again or "‹ world" to zoom back out; zoomed country shows its real visited cities as chips below the map
 
 ## Backlog
+
+Tracked as issues on the [Portfolio board](https://github.com/users/CristianGaudino/projects/11) from Nov 2026; the list below is the older log.
 
 ### Waiting on env / external setup
 - [ ] Vercel env: `GITHUB_TOKEN` (also unlocks the heatmap), `SPOTIFY_CLIENT_ID`/`SECRET`/`REFRESH_TOKEN` (re-run `spotify-token.mjs` for the `user-top-read` scope), `TRACKER_STATUS_URL`, `VERCEL_TOKEN` + `VERCEL_PROJECT_ID` (deploy row)
